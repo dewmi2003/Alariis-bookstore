@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Error - Bookstore</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <div th:replace="~{fragments/header :: nav}"></div>
+
+    <div class="container" style="text-align: center; padding-top: 4rem;">
+        <h1 style="font-size: 4rem; color: var(--accent-color);">Oops!</h1>
+        <h2 style="margin-bottom: 2rem;">Something went wrong.</h2>
+
+        <p th:if="${error}" th:text="${error}"
+            style="background: #f8d7da; padding: 1rem; border-radius: 4px; display: inline-block;">Error details</p>
+
+        <div style="margin-top: 2rem;">
+            <a th:href="@{/}" class="btn">Go Back Home</a>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+
+</html>

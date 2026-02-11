@@ -1,0 +1,38 @@
+<nav xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" class="navbar">
+    <div class="nav-container">
+        <a th:href="@{/}" class="logo">
+            <span class="logo-icon">✨</span>
+            <span class="logo-text">Alaris Bookstore</span>
+        </a>
+
+        <div class="nav-menu">
+            <a th:href="@{/books}" class="nav-link" sec:authorize="!hasRole('ADMIN')">Browse Books</a>
+
+            <!-- ADMIN LINKS -->
+            <span sec:authorize="hasRole('ADMIN')" style="display: flex; gap: 20px;">
+                <a th:href="@{/admin/dashboard}" class="nav-link admin-link">Dashboard</a>
+            </span>
+
+            <!-- USER LINKS (Visible to Customers) -->
+            <span sec:authorize="isAuthenticated() and !hasRole('ADMIN')" style="display: flex; gap: 20px;">
+                <a th:href="@{/cart}" class="nav-link cart-link">
+                    Cart <span class="cart-badge" th:if="${session.cartItemCount > 0}"
+                        th:text="${session.cartItemCount}">0</span>
+                </a>
+                <a th:href="@{/orders}" class="nav-link">My Orders</a>
+            </span>
+
+            <!-- AUTH BUTTONS -->
+            <span sec:authorize="isAnonymous()">
+                <a th:href="@{/login}" class="btn-login">Login</a>
+                <a th:href="@{/register}" class="btn-register">Register</a>
+            </span>
+
+            <span sec:authorize="isAuthenticated()">
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </span>
+        </div>
+    </div>
+</nav>

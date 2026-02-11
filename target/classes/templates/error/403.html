@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>403 - Forbidden</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <div th:replace="~{fragments/header :: nav}"></div>
+
+    <div class="container">
+        <div style="max-width: 600px; margin: 3rem auto; text-align: center; background: white; padding: 3rem 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <div style="font-size: 5rem; color: #e67e22; margin-bottom: 1rem;">403</div>
+            <h1 style="color: #2c3e50; margin-bottom: 1rem;">Access Forbidden</h1>
+            <p style="color: #666; font-size: 1.1rem; margin-bottom: 2rem;">
+                Sorry, you don't have permission to access this resource. You may need administrator privileges.
+            </p>
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <a th:href="@{/}" class="btn">Go to Home</a>
+                <a th:href="@{/books}" class="btn" style="background: #95a5a6;">Browse Books</a>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+
+</html>

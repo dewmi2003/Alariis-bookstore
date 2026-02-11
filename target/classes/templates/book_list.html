@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <title>Bookstore - Browse</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div th:replace="~{fragments/header :: nav}"></div>
+
+    <div class="container">
+        <h1 class="section-title">Browse Books</h1>
+
+        <div class="search-container" style="text-align: center; margin-bottom: 3rem;">
+            <form th:action="@{/books}" method="get"
+                style="display: inline-flex; gap: 0.5rem; width: 100%; max-width: 600px;">
+                <input type="text" name="query" class="form-control" placeholder="Search by title, author, or ISBN..."
+                    th:value="${param.query}" style="border-radius: 50px; padding-left: 1.5rem;">
+                <button type="submit" class="btn"
+                    style="border-radius: 50px; padding-left: 2rem; padding-right: 2rem;">Search</button>
+            </form>
+        </div>
+
+        <div class="book-grid">
+            <div class="book-card" th:each="book : ${books}">
+                <div class="book-image-wrapper">
+                    <img th:if="${book.coverImage != null}" th:src="@{'/images/books/' + ${book.coverImage}}"
+                        class="book-image" alt="Book Cover">
+                    <div class="book-image" th:if="${book.coverImage == null}"
+                        style="display:flex;align-items:center;justify-content:center;color:#777;background:#eee;height:100%;width:100%;">
+                        No Image
+                    </div>
+
+                    <!-- Overlay Actions (Modern Touch) -->
+                    <div class="book-overlay">
+                        <a th:href="@{'/book/' + ${book.id}}" class="btn-overlay" title="View Details"><i
+                                class="fas fa-eye"></i></a>
+                    </div>
+                </div>
+
+                <div class="book-info">
+                    <div class="book-title" th:text="${book.title}" title="${book.title}">Title</div>
+                    <div class="book-author" th:text="${book.author}">Author</div>
+                    <div class="book-category" th:if="${book.category != null}" th:text="${book.category.name}"
+                        style="font-size: 0.8rem; text-transform: uppercase; color: #888; margin-bottom: 0.5rem;">
+                        CATEGORY</div>
+                    <div class="book-price" th:text="'$' + ${book.price}">$0.00</div>
+
+                    <!-- VISIBLE ACTIONS UNDER THE PICTURE (As Requested) -->
+                    <div style="display: flex; gap: 0.5rem; justify-content: center; margin-top: 1rem;">
+
+                        <!-- Logged In: Add to Cart -->
+                        <form th:action="@{/cart/add}" method="post" sec:authorize="isAuthenticated()">
+                            <input type="hidden" name="bookId" th:value="${book.id}">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn"
+                                style="background-color: var(--accent-color); width: 100%; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
+                        </form>
+
+                        <!-- Anonymous: Login to Add -->
+                        <a th:href="@{/login}" class="btn" sec:authorize="isAnonymous()"
+                            style="background-color: var(--secondary-accent);">
+                            <i class="fas fa-sign-in-alt"></i> Login to Buy
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${#lists.isEmpty(books)}" style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
+                <i class="fas fa-search" style="font-size: 3rem; color: #ddd; margin-bottom: 1rem;"></i>
+                <p>No books found matching your criteria.</p>
+                <a th:href="@{/books}" class="btn" style="margin-top: 1rem;">View All Books</a>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+
+</html>

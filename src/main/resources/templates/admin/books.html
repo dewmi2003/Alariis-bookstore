@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Manage Books - Admin</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <div th:replace="~{fragments/header :: nav}"></div>
+
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h1>Manage Books</h1>
+            <a th:href="@{/admin/books/new}" class="btn">Add New Book</a>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cover</th>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Price</th>
+                    <th>Category</th>
+                    <th>Featured</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="book : ${books}">
+                    <td th:text="${book.id}">1</td>
+                    <td>
+                        <img th:if="${book.coverImage != null}" th:src="@{'/images/books/' + ${book.coverImage}}"
+                            style="height: 50px;">
+                    </td>
+                    <td th:text="${book.title}">Book Title</td>
+                    <td th:text="${book.author}">Author Name</td>
+                    <td th:text="'$' + ${book.price}">$10.00</td>
+                    <td th:text="${book.category != null ? book.category.name : '-'}">Category</td>
+                    <td>
+                        <a th:href="@{'/admin/books/toggle-feature/' + ${book.id}}"
+                            th:class="${book.featured} ? 'btn' : 'btn'"
+                            th:style="${book.featured} ? 'background-color: #27ae60; padding: 0.2rem 0.5rem; font-size: 0.8rem;' : 'background-color: #95a5a6; padding: 0.2rem 0.5rem; font-size: 0.8rem;'"
+                            th:text="${book.featured} ? 'Yes' : 'No'">
+                            Feature
+                        </a>
+                    </td>
+                    <td>
+                        <a th:href="@{'/admin/books/edit/' + ${book.id}}" class="btn"
+                            style="background-color: #f39c12; padding: 0.3rem 0.8rem; font-size: 0.9rem;">Edit</a>
+                        <a th:href="@{'/admin/books/delete/' + ${book.id}}" class="btn btn-danger"
+                            onclick="return confirm('Are you sure you want to delete this book?');"
+                            style="padding: 0.3rem 0.8rem; font-size: 0.9rem;">Delete</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+
+</html>

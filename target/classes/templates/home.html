@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Home - Alaris Bookstore</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div th:replace="~{fragments/header :: nav}"></div>
+
+    <!-- HERO SECTION -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">Discover Your Next Adventure</h1>
+            <p class="hero-subtitle">Explore a world of stories, knowledge, and imagination at Alaris Bookstore.</p>
+            <a th:href="@{/books}" class="btn-hero">Shop Now</a>
+        </div>
+    </section>
+
+    <div class="container">
+
+        <!-- FEATURED BOOKS SECTION -->
+        <section class="home-section">
+            <h2 class="section-title">Featured Books</h2>
+            <div class="book-grid">
+                <div class="book-card" th:each="book : ${featuredBooks}">
+                    <div class="book-image-wrapper">
+                        <img th:if="${book.coverImage != null}" th:src="@{'/images/books/' + ${book.coverImage}}"
+                            class="book-image" alt="Book Cover">
+                        <div class="book-image" th:if="${book.coverImage == null}"
+                            style="display:flex;align-items:center;justify-content:center;color:#777;background:#eee;height:100%;width:100%;">
+                            No Image
+                        </div>
+
+                        <div class="book-overlay">
+                            <a th:href="@{'/book/' + ${book.id}}" class="btn-overlay" title="View Details"><i
+                                    class="fas fa-eye"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="book-info">
+                        <div class="book-title" th:text="${book.title}" title="${book.title}">Title</div>
+                        <div class="book-author" th:text="${book.author}">Author</div>
+                        <div class="book-category" th:if="${book.category != null}" th:text="${book.category.name}"
+                            style="font-size: 0.8rem; text-transform: uppercase; color: #888; margin-bottom: 0.5rem;">
+                            CATEGORY</div>
+                        <div class="book-price" th:text="'$' + ${book.price}">$0.00</div>
+
+                        <div style="display: flex; gap: 0.5rem; justify-content: center; margin-top: 1rem;">
+                            <form th:action="@{/cart/add}" method="post" sec:authorize="isAuthenticated()">
+                                <input type="hidden" name="bookId" th:value="${book.id}">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="btn"
+                                    style="background-color: var(--accent-color); width: 100%; display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fas fa-shopping-cart"></i> Add
+                                </button>
+                            </form>
+                            <a th:href="@{'/book/' + ${book.id}}" class="btn"
+                                style="background-color: var(--secondary-accent);">View</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SPECIAL OFFERS SECTION -->
+        <section class="home-section offers-section"
+            style="background: linear-gradient(45deg, #2c3e50, #34495e); padding: 3rem; border-radius: 20px; color: white; text-align: center; margin-bottom: 4rem;">
+            <h2 style="color: #f1c40f; font-size: 2.5rem; margin-bottom: 1rem;">✨ Special Offer! ✨</h2>
+            <p style="font-size: 1.2rem; margin-bottom: 2rem;">Get 20% off all Sci-Fi books this week only! use code:
+                <strong>SCIFI20</strong>
+            </p>
+            <a th:href="@{/books?query=Sci-Fi}" class="btn" style="background: #f1c40f; color: #2c3e50;">Browse
+                Sci-Fi</a>
+        </section>
+
+        <!-- CATEGORIES SECTION -->
+        <section class="home-section">
+            <h2 class="section-title">Explore Categories</h2>
+            <div class="category-grid"
+                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem;">
+                <div th:each="cat : ${categories}" class="category-card"
+                    style="background: white; padding: 2rem; border-radius: 15px; text-align: center; box-shadow: var(--shadow); transition: var(--transition); border: 1px solid #eee;">
+                    <h3 th:text="${cat.name}" style="margin: 0; font-size: 1.2rem;">category</h3>
+                    <a th:href="@{/books(query=${cat.name})}"
+                        style="display: block; margin-top: 1rem; color: var(--accent-color); font-weight: 600;">View
+                        Books &rarr;</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- UPCOMING BOOKS (Simulated) -->
+        <section class="home-section" th:if="${not #lists.isEmpty(recentBooks)}">
+            <h2 class="section-title">Fresh Arrivals</h2>
+            <div class="book-grid">
+                <div class="book-card" th:each="book : ${recentBooks}">
+                    <div class="book-image-wrapper">
+                        <img th:if="${book.coverImage != null}" th:src="@{'/images/books/' + ${book.coverImage}}"
+                            class="book-image" alt="Book Cover">
+                        <div class="book-image" th:if="${book.coverImage == null}"
+                            style="display:flex;align-items:center;justify-content:center;color:#777;background:#eee;height:100%;width:100%;">
+                            No Image
+                        </div>
+
+                        <div class="book-overlay">
+                            <a th:href="@{'/book/' + ${book.id}}" class="btn-overlay" title="View Details"><i
+                                    class="fas fa-eye"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="book-info">
+                        <div class="book-title" th:text="${book.title}" title="${book.title}">Title</div>
+                        <div class="book-author" th:text="${book.author}">Author</div>
+                        <div class="book-category" th:if="${book.category != null}" th:text="${book.category.name}"
+                            style="font-size: 0.8rem; text-transform: uppercase; color: #888; margin-bottom: 0.5rem;">
+                            CATEGORY</div>
+                        <div class="book-price" th:text="'$' + ${book.price}">$0.00</div>
+                        <div style="display: flex; gap: 0.5rem; justify-content: center; margin-top: 1rem;">
+                            <form th:action="@{/cart/add}" method="post" sec:authorize="isAuthenticated()">
+                                <input type="hidden" name="bookId" th:value="${book.id}">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="btn"
+                                    style="background-color: var(--accent-color); width: 100%; display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fas fa-shopping-cart"></i> Add
+                                </button>
+                            </form>
+                            <a th:href="@{'/book/' + ${book.id}}" class="btn"
+                                style="background-color: var(--secondary-accent);">View</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- REVIEWS SECTION -->
+        <section class="home-section reviews-section" style="margin-top: 4rem;">
+            <h2 class="section-title">What Readers Say</h2>
+            <div class="reviews-grid"
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                <div class="review-card"
+                    style="background: white; padding: 2rem; border-radius: 15px; box-shadow: var(--shadow);">
+                    <div style="color: #f1c40f; margin-bottom: 1rem;">⭐⭐⭐⭐⭐</div>
+                    <p style="font-style: italic; color: #555;">"Alaris Bookstore has the best collection of obscure
+                        sci-fi novels. I'm addicted!"</p>
+                    <h4 style="margin-top: 1rem; color: var(--secondary-accent);">Sarah J.</h4>
+                </div>
+                <div class="review-card"
+                    style="background: white; padding: 2rem; border-radius: 15px; box-shadow: var(--shadow);">
+                    <div style="color: #f1c40f; margin-bottom: 1rem;">⭐⭐⭐⭐⭐</div>
+                    <p style="font-style: italic; color: #555;">"Delivery was super fast and the books came in perfect
+                        condition. Highly recommend."</p>
+                    <h4 style="margin-top: 1rem; color: var(--secondary-accent);">Mike R.</h4>
+                </div>
+                <div class="review-card"
+                    style="background: white; padding: 2rem; border-radius: 15px; box-shadow: var(--shadow);">
+                    <div style="color: #f1c40f; margin-bottom: 1rem;">⭐⭐⭐⭐½</div>
+                    <p style="font-style: italic; color: #555;">"The website is so beautiful and easy to use now. Adding
+                        to cart is a breeze!"</p>
+                    <h4 style="margin-top: 1rem; color: var(--secondary-accent);">Emily W.</h4>
+                </div>
+            </div>
+        </section>
+
+        <!-- FUNNIER THINGS SECTION -->
+        <section class="home-section fun-section" style="margin-top: 4rem; text-align: center;">
+            <h2 class="section-title">Funnier Things</h2>
+            <div style="background: #fff0f6; padding: 3rem; border-radius: 20px;">
+                <h3>Why did the book join the police?</h3>
+                <p style="font-size: 1.5rem; color: var(--accent-color); font-weight: bold; margin: 1rem 0;">Because it
+                    wanted to go under cover! 🕵️‍♂️📖</p>
+                <p style="margin-top: 2rem;">Need a laugh? Check out our <a th:href="@{/books?query=comedy}"
+                        style="color: var(--secondary-accent); text-decoration: underline;">Comedy Section</a>.</p>
+            </div>
+        </section>
+
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+
+</html>

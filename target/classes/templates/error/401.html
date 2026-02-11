@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>401 - Unauthorized</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <div th:replace="~{fragments/header :: nav}"></div>
+
+    <div class="container">
+        <div style="max-width: 600px; margin: 3rem auto; text-align: center; background: white; padding: 3rem 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <div style="font-size: 5rem; color: #f39c12; margin-bottom: 1rem;">401</div>
+            <h1 style="color: #2c3e50; margin-bottom: 1rem;">Unauthorized</h1>
+            <p style="color: #666; font-size: 1.1rem; margin-bottom: 2rem;">
+                You need to be logged in to access this page. Please login to continue.
+            </p>
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <a th:href="@{/login}" class="btn">Login</a>
+                <a th:href="@{/register}" class="btn" style="background: #27ae60;">Create Account</a>
+                <a th:href="@{/}" class="btn" style="background: #95a5a6;">Go to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+
+</html>

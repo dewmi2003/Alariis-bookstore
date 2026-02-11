@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Book Form - Admin</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <div th:replace="~{fragments/header :: nav}"></div>
+
+    <div class="container" style="max-width: 600px;">
+        <h2 th:text="${book.id == null ? 'Add New Book' : 'Edit Book'}">Book Form</h2>
+
+        <form th:action="@{${book.id == null ? '/admin/books' : '/admin/books/' + book.id}}" th:object="${book}"
+            method="post" enctype="multipart/form-data" style="background: white; padding: 2rem; border-radius: 8px;">
+
+            <input type="hidden" th:field="*{id}">
+            <input type="hidden" th:field="*{coverImage}">
+
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" id="title" th:field="*{title}" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="author">Author</label>
+                <input type="text" id="author" th:field="*{author}" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="isbn">ISBN</label>
+                <input type="text" id="isbn" th:field="*{isbn}" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="category">Category</label>
+                <select id="category" th:field="*{category}" class="form-control">
+                    <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}">Category</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="price">Price</label>
+                <input type="number" step="0.01" id="price" th:field="*{price}" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" th:field="*{description}" class="form-control" rows="4"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="image">Cover Image</label>
+                <input type="file" id="image" name="image" class="form-control" accept="image/png, image/jpeg">
+                <p th:if="${book.coverImage != null}" style="margin-top: 0.5rem; font-size: 0.9rem;">
+                    Current: <span th:text="${book.coverImage}"></span>
+                </p>
+            </div>
+
+            <button type="submit" class="btn" style="width: 100%;">Save Book</button>
+            <a th:href="@{/admin/books}" style="display: block; text-align: center; margin-top: 1rem;">Cancel</a>
+        </form>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+
+</html>

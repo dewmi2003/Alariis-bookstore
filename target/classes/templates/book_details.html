@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title th:text="${book.title} + ' - Bookstore'"></title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <div th:replace="~{fragments/header :: nav}"></div>
+
+    <div class="container">
+        <div style="display: flex; gap: 3rem; background: white; padding: 2rem; border-radius: 8px;">
+            <div style="flex: 0 0 300px;">
+                <img th:if="${book.coverImage != null}" th:src="@{'/images/books/' + ${book.coverImage}}"
+                    style="width: 100%; border-radius: 4px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" alt="Book Cover">
+                <div th:if="${book.coverImage == null}"
+                    style="width: 100%; height: 400px; background: #ddd; display: flex; align-items: center; justify-content: center; border-radius: 4px;">
+                    No Image
+                </div>
+            </div>
+
+            <div style="flex: 1;">
+                <h1 th:text="${book.title}" style="margin-top: 0;">Title</h1>
+                <h3 class="text-muted" th:text="'by ' + ${book.author}">Author</h3>
+                <p><strong>ISBN:</strong> <span th:text="${book.isbn}">123</span></p>
+                <p><strong>Category:</strong> <span
+                        th:text="${book.category != null ? book.category.name : 'Uncategorized'}">Genre</span></p>
+                <h2 style="color: var(--accent-color);" th:text="'$' + ${book.price}">$19.99</h2>
+
+                <p style="margin: 2rem 0; line-height: 1.6;" th:text="${book.description}">Description...</p>
+
+                <form th:action="@{/cart/add}" method="post" sec:authorize="isAuthenticated()">
+                    <input type="hidden" name="bookId" th:value="${book.id}">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                        <label for="quantity">Quantity:</label>
+                        <input type="number" name="quantity" id="quantity" value="1" min="1" max="10"
+                            style="width: 60px; padding: 0.5rem;">
+                    </div>
+                    <button type="submit" class="btn">Add to Cart</button>
+                </form>
+
+                <div sec:authorize="isAnonymous()">
+                    <p><a th:href="@{/login}" style="color: var(--primary-color); font-weight: bold;">Login</a> to
+                        purchase this book.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+
+</html>

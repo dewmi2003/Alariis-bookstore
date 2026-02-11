@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Category Form - Admin</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <div th:replace="~{fragments/header :: nav}"></div>
+    <div class="container">
+        <h1>Category Details</h1>
+        <form th:action="@{/admin/categories}" th:object="${category}" method="post"
+            style="max-width: 500px; margin-top: 2rem;">
+            <input type="hidden" th:field="*{id}">
+            <div class="form-group">
+                <label for="name">Category Name</label>
+                <input type="text" id="name" th:field="*{name}" class="form-control" required>
+            </div>
+            <button type="submit" class="btn">Save Category</button>
+        </form>
+    </div>
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+
+</html>
