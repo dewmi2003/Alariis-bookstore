@@ -1,183 +1,308 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout}">
 
 <head>
-    <title>Home - Alaris Bookstore</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Alariis Bookstore - Discover Your Next Favorite Book</title>
 </head>
 
 <body>
-    <div th:replace="~{fragments/header :: nav}"></div>
-
-    <!-- HERO SECTION -->
-    <section class="hero-section">
-        <div class="hero-content">
-            <h1 class="hero-title">Discover Your Next Adventure</h1>
-            <p class="hero-subtitle">Explore a world of stories, knowledge, and imagination at Alaris Bookstore.</p>
-            <a th:href="@{/books}" class="btn-hero">Shop Now</a>
+    <main layout:fragment="content">
+        <!-- Announcement Bar Move to inside content or layout if needed, but keeping it here for home specificity -->
+        <div class="announcement-bar">
+            <div class="announcement-content">
+                <span class="announcement-item">🎉 Free Shipping on Orders Over $50</span>
+                <span class="announcement-item">⚡ Flash Sale: 30% Off Best Sellers</span>
+                <span class="announcement-item">📚 New Arrivals Every Week</span>
+                <span class="announcement-item">🎁 Join Our Loyalty Program</span>
+            </div>
         </div>
-    </section>
 
-    <div class="container">
-
-        <!-- FEATURED BOOKS SECTION -->
-        <section class="home-section">
-            <h2 class="section-title">Featured Books</h2>
-            <div class="book-grid">
-                <div class="book-card" th:each="book : ${featuredBooks}">
-                    <div class="book-image-wrapper">
-                        <img th:if="${book.coverImage != null}" th:src="@{'/images/books/' + ${book.coverImage}}"
-                            class="book-image" alt="Book Cover">
-                        <div class="book-image" th:if="${book.coverImage == null}"
-                            style="display:flex;align-items:center;justify-content:center;color:#777;background:#eee;height:100%;width:100%;">
-                            No Image
-                        </div>
-
-                        <div class="book-overlay">
-                            <a th:href="@{'/book/' + ${book.id}}" class="btn-overlay" title="View Details"><i
-                                    class="fas fa-eye"></i></a>
-                        </div>
+        <!-- Hero Section with Parallax -->
+        <section class="hero-premium">
+            <div class="hero-bg-animation"></div>
+            <div class="hero-content-wrapper">
+                <div class="hero-text">
+                    <h1 class="hero-heading">Discover Your Next <span class="gradient-text">Favorite Book</span></h1>
+                    <p class="hero-subheading">Explore thousands of books across all genres. From bestsellers to hidden
+                        gems.</p>
+                    <div class="hero-cta">
+                        <a th:href="@{/books}" class="btn-primary-hero">
+                            <span>Shop Now</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                        <a th:href="@{#categories}" class="btn-secondary-hero">
+                            <span>Explore Categories</span>
+                        </a>
                     </div>
-
-                    <div class="book-info">
-                        <div class="book-title" th:text="${book.title}" title="${book.title}">Title</div>
-                        <div class="book-author" th:text="${book.author}">Author</div>
-                        <div class="book-category" th:if="${book.category != null}" th:text="${book.category.name}"
-                            style="font-size: 0.8rem; text-transform: uppercase; color: #888; margin-bottom: 0.5rem;">
-                            CATEGORY</div>
-                        <div class="book-price" th:text="'$' + ${book.price}">$0.00</div>
-
-                        <div style="display: flex; gap: 0.5rem; justify-content: center; margin-top: 1rem;">
-                            <form th:action="@{/cart/add}" method="post" sec:authorize="isAuthenticated()">
-                                <input type="hidden" name="bookId" th:value="${book.id}">
-                                <input type="hidden" name="quantity" value="1">
-                                <button type="submit" class="btn"
-                                    style="background-color: var(--accent-color); width: 100%; display: flex; align-items: center; gap: 0.5rem;">
-                                    <i class="fas fa-shopping-cart"></i> Add
-                                </button>
-                            </form>
-                            <a th:href="@{'/book/' + ${book.id}}" class="btn"
-                                style="background-color: var(--secondary-accent);">View</a>
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <span class="stat-number" data-target="50000">0</span>+
+                            <span class="stat-label">Books</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" data-target="10000">0</span>+
+                            <span class="stat-label">Readers</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" data-target="500">0</span>+
+                            <span class="stat-label">Authors</span>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
-
-        <!-- SPECIAL OFFERS SECTION -->
-        <section class="home-section offers-section"
-            style="background: linear-gradient(45deg, #2c3e50, #34495e); padding: 3rem; border-radius: 20px; color: white; text-align: center; margin-bottom: 4rem;">
-            <h2 style="color: #f1c40f; font-size: 2.5rem; margin-bottom: 1rem;">✨ Special Offer! ✨</h2>
-            <p style="font-size: 1.2rem; margin-bottom: 2rem;">Get 20% off all Sci-Fi books this week only! use code:
-                <strong>SCIFI20</strong>
-            </p>
-            <a th:href="@{/books?query=Sci-Fi}" class="btn" style="background: #f1c40f; color: #2c3e50;">Browse
-                Sci-Fi</a>
-        </section>
-
-        <!-- CATEGORIES SECTION -->
-        <section class="home-section">
-            <h2 class="section-title">Explore Categories</h2>
-            <div class="category-grid"
-                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem;">
-                <div th:each="cat : ${categories}" class="category-card"
-                    style="background: white; padding: 2rem; border-radius: 15px; text-align: center; box-shadow: var(--shadow); transition: var(--transition); border: 1px solid #eee;">
-                    <h3 th:text="${cat.name}" style="margin: 0; font-size: 1.2rem;">category</h3>
-                    <a th:href="@{/books(query=${cat.name})}"
-                        style="display: block; margin-top: 1rem; color: var(--accent-color); font-weight: 600;">View
-                        Books &rarr;</a>
-                </div>
-            </div>
-        </section>
-
-        <!-- UPCOMING BOOKS (Simulated) -->
-        <section class="home-section" th:if="${not #lists.isEmpty(recentBooks)}">
-            <h2 class="section-title">Fresh Arrivals</h2>
-            <div class="book-grid">
-                <div class="book-card" th:each="book : ${recentBooks}">
-                    <div class="book-image-wrapper">
-                        <img th:if="${book.coverImage != null}" th:src="@{'/images/books/' + ${book.coverImage}}"
-                            class="book-image" alt="Book Cover">
-                        <div class="book-image" th:if="${book.coverImage == null}"
-                            style="display:flex;align-items:center;justify-content:center;color:#777;background:#eee;height:100%;width:100%;">
-                            No Image
-                        </div>
-
-                        <div class="book-overlay">
-                            <a th:href="@{'/book/' + ${book.id}}" class="btn-overlay" title="View Details"><i
-                                    class="fas fa-eye"></i></a>
-                        </div>
+                <div class="hero-visual">
+                    <div class="floating-book book-1">
+                        <i class="fas fa-book"></i>
                     </div>
-
-                    <div class="book-info">
-                        <div class="book-title" th:text="${book.title}" title="${book.title}">Title</div>
-                        <div class="book-author" th:text="${book.author}">Author</div>
-                        <div class="book-category" th:if="${book.category != null}" th:text="${book.category.name}"
-                            style="font-size: 0.8rem; text-transform: uppercase; color: #888; margin-bottom: 0.5rem;">
-                            CATEGORY</div>
-                        <div class="book-price" th:text="'$' + ${book.price}">$0.00</div>
-                        <div style="display: flex; gap: 0.5rem; justify-content: center; margin-top: 1rem;">
-                            <form th:action="@{/cart/add}" method="post" sec:authorize="isAuthenticated()">
-                                <input type="hidden" name="bookId" th:value="${book.id}">
-                                <input type="hidden" name="quantity" value="1">
-                                <button type="submit" class="btn"
-                                    style="background-color: var(--accent-color); width: 100%; display: flex; align-items: center; gap: 0.5rem;">
-                                    <i class="fas fa-shopping-cart"></i> Add
-                                </button>
-                            </form>
-                            <a th:href="@{'/book/' + ${book.id}}" class="btn"
-                                style="background-color: var(--secondary-accent);">View</a>
-                        </div>
+                    <div class="floating-book book-2">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <div class="floating-book book-3">
+                        <i class="fas fa-bookmark"></i>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- REVIEWS SECTION -->
-        <section class="home-section reviews-section" style="margin-top: 4rem;">
-            <h2 class="section-title">What Readers Say</h2>
-            <div class="reviews-grid"
-                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
-                <div class="review-card"
-                    style="background: white; padding: 2rem; border-radius: 15px; box-shadow: var(--shadow);">
-                    <div style="color: #f1c40f; margin-bottom: 1rem;">⭐⭐⭐⭐⭐</div>
-                    <p style="font-style: italic; color: #555;">"Alaris Bookstore has the best collection of obscure
-                        sci-fi novels. I'm addicted!"</p>
-                    <h4 style="margin-top: 1rem; color: var(--secondary-accent);">Sarah J.</h4>
-                </div>
-                <div class="review-card"
-                    style="background: white; padding: 2rem; border-radius: 15px; box-shadow: var(--shadow);">
-                    <div style="color: #f1c40f; margin-bottom: 1rem;">⭐⭐⭐⭐⭐</div>
-                    <p style="font-style: italic; color: #555;">"Delivery was super fast and the books came in perfect
-                        condition. Highly recommend."</p>
-                    <h4 style="margin-top: 1rem; color: var(--secondary-accent);">Mike R.</h4>
-                </div>
-                <div class="review-card"
-                    style="background: white; padding: 2rem; border-radius: 15px; box-shadow: var(--shadow);">
-                    <div style="color: #f1c40f; margin-bottom: 1rem;">⭐⭐⭐⭐½</div>
-                    <p style="font-style: italic; color: #555;">"The website is so beautiful and easy to use now. Adding
-                        to cart is a breeze!"</p>
-                    <h4 style="margin-top: 1rem; color: var(--secondary-accent);">Emily W.</h4>
+        <!-- Featured Categories -->
+        <section class="categories-section" id="categories">
+            <div class="container">
+                <h2 class="section-title">Explore by Category</h2>
+                <div class="categories-grid">
+                    <div class="category-card" th:each="cat : ${categories}">
+                        <div class="category-icon">
+                            <i class="fas fa-book-reader"></i>
+                        </div>
+                        <h3 th:text="${cat.name}">Fiction</h3>
+                        <p>Discover amazing stories</p>
+                        <a th:href="@{/books(query=${cat.name})}" class="category-link">
+                            Explore <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- FUNNIER THINGS SECTION -->
-        <section class="home-section fun-section" style="margin-top: 4rem; text-align: center;">
-            <h2 class="section-title">Funnier Things</h2>
-            <div style="background: #fff0f6; padding: 3rem; border-radius: 20px;">
-                <h3>Why did the book join the police?</h3>
-                <p style="font-size: 1.5rem; color: var(--accent-color); font-weight: bold; margin: 1rem 0;">Because it
-                    wanted to go under cover! 🕵️‍♂️📖</p>
-                <p style="margin-top: 2rem;">Need a laugh? Check out our <a th:href="@{/books?query=comedy}"
-                        style="color: var(--secondary-accent); text-decoration: underline;">Comedy Section</a>.</p>
+        <!-- Trending Books Carousel -->
+        <section class="trending-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Trending Now</h2>
+                    <div class="carousel-controls">
+                        <button class="carousel-btn prev" onclick="scrollCarousel('trending', -1)">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="carousel-btn next" onclick="scrollCarousel('trending', 1)">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="books-carousel" id="trending-carousel">
+                    <div class="book-card-modern" th:each="book : ${featuredBooks}">
+                        <div class="book-badge">Featured</div>
+                        <div class="book-image-container">
+                            <img th:if="${book.coverImage != null}" th:src="@{'/images/books/' + ${book.coverImage}}"
+                                alt="Book Cover" class="book-cover">
+                            <div th:if="${book.coverImage == null}" class="book-placeholder">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="book-hover-overlay">
+                                <a th:href="@{'/book/' + ${book.id}}" class="quick-view-btn">
+                                    <i class="fas fa-eye"></i> View Details
+                                </a>
+                            </div>
+                        </div>
+                        <div class="book-details">
+                            <h4 class="book-title-modern" th:text="${book.title}">Book Title</h4>
+                            <p class="book-author-modern" th:text="${book.author}">Author Name</p>
+                            <div class="book-rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                                <span>(4.5)</span>
+                            </div>
+                            <div class="book-price-row">
+                                <span class="book-price-modern" th:text="'$' + ${book.price}">$19.99</span>
+                                <form th:action="@{/cart/add}" method="post" style="display:inline;">
+                                    <input type="hidden" name="bookId" th:value="${book.id}">
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button type="submit" class="add-to-cart-btn">
+                                        <i class="fas fa-cart-plus"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
-    </div>
+        <!-- Flash Sale Section -->
+        <section class="flash-sale-section">
+            <div class="container">
+                <div class="flash-sale-content">
+                    <div class="flash-sale-text">
+                        <span class="flash-badge">⚡ FLASH SALE</span>
+                        <h2>Limited Time Offer!</h2>
+                        <p>Up to 50% off on selected bestsellers</p>
+                    </div>
+                    <div class="countdown-timer">
+                        <div class="time-unit">
+                            <span class="time-value" id="hours">23</span>
+                            <span class="time-label">Hours</span>
+                        </div>
+                        <div class="time-separator">:</div>
+                        <div class="time-unit">
+                            <span class="time-value" id="minutes">45</span>
+                            <span class="time-label">Minutes</span>
+                        </div>
+                        <div class="time-separator">:</div>
+                        <div class="time-unit">
+                            <span class="time-value" id="seconds">30</span>
+                            <span class="time-label">Seconds</span>
+                        </div>
+                    </div>
+                    <a th:href="@{/books}" class="btn-flash-sale">Shop Sale</a>
+                </div>
+            </div>
+        </section>
 
-    <div th:replace="~{fragments/footer :: footer}"></div>
+        <!-- Fresh Arrivals -->
+        <section class="arrivals-section" th:if="${not #lists.isEmpty(recentBooks)}">
+            <div class="container">
+                <h2 class="section-title">Fresh Arrivals</h2>
+                <div class="books-grid-modern">
+                    <div class="book-card-modern" th:each="book : ${recentBooks}">
+                        <div class="book-badge new">New</div>
+                        <div class="book-image-container">
+                            <img th:if="${book.coverImage != null}" th:src="@{'/images/books/' + ${book.coverImage}}"
+                                alt="Book Cover" class="book-cover">
+                            <div th:if="${book.coverImage == null}" class="book-placeholder">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="book-hover-overlay">
+                                <a th:href="@{'/book/' + ${book.id}}" class="quick-view-btn">
+                                    <i class="fas fa-eye"></i> View Details
+                                </a>
+                            </div>
+                        </div>
+                        <div class="book-details">
+                            <h4 class="book-title-modern" th:text="${book.title}">Book Title</h4>
+                            <p class="book-author-modern" th:text="${book.author}">Author Name</p>
+                            <div class="book-rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                                <span>(4.0)</span>
+                            </div>
+                            <div class="book-price-row">
+                                <span class="book-price-modern" th:text="'$' + ${book.price}">$19.99</span>
+                                <form th:action="@{/cart/add}" method="post" style="display:inline;">
+                                    <input type="hidden" name="bookId" th:value="${book.id}">
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button type="submit" class="add-to-cart-btn">
+                                        <i class="fas fa-cart-plus"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Customer Reviews Carousel -->
+        <section class="reviews-section">
+            <div class="container">
+                <h2 class="section-title">What Our Readers Say</h2>
+                <div class="reviews-carousel">
+                    <div class="review-card-modern">
+                        <div class="review-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p class="review-text">"Alariis has the best collection of sci-fi novels I've ever seen. The
+                            website
+                            is beautiful and easy to navigate!"</p>
+                        <div class="reviewer">
+                            <div class="reviewer-avatar">SJ</div>
+                            <div>
+                                <h4>Sarah Johnson</h4>
+                                <p>Verified Buyer</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="review-card-modern">
+                        <div class="review-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p class="review-text">"Fast delivery and excellent customer service. My books arrived in
+                            perfect
+                            condition!"</p>
+                        <div class="reviewer">
+                            <div class="reviewer-avatar">MR</div>
+                            <div>
+                                <h4>Mike Rodriguez</h4>
+                                <p>Verified Buyer</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="review-card-modern">
+                        <div class="review-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <p class="review-text">"Love the personalized recommendations! I've discovered so many amazing
+                            books
+                            through this platform."</p>
+                        <div class="reviewer">
+                            <div class="reviewer-avatar">EW</div>
+                            <div>
+                                <h4>Emily Watson</h4>
+                                <p>Verified Buyer</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Newsletter Section -->
+        <section class="newsletter-section">
+            <div class="container">
+                <div class="newsletter-content">
+                    <h2>Join Our Book Club</h2>
+                    <p>Get exclusive deals, new arrivals, and reading recommendations delivered to your inbox</p>
+                    <form class="newsletter-form">
+                        <div class="input-group-newsletter">
+                            <input type="email" placeholder="Enter your email address" required>
+                            <button type="submit" class="btn-newsletter">
+                                Subscribe <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <th:block layout:fragment="extra-js">
+        <script th:src="@{/js/premium-home.js}"></script>
+    </th:block>
 </body>
 
 </html>

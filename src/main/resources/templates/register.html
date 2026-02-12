@@ -1,54 +1,104 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout}">
 
 <head>
-    <title>Register - Bookstore</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <title>Join Us - Alariis Bookstore</title>
 </head>
 
 <body>
-    <div th:replace="~{fragments/header :: nav}"></div>
+    <th:block layout:fragment="extra-css">
+        <style>
+            .auth-section {
+                min-height: 80vh;
+                display: flex;
+                align-items: center;
+                background: var(--bg-soft-white);
+                padding: var(--space-8) 0;
+            }
 
-    <div class="container" style="max-width: 500px;">
-        <h2 style="text-align: center;">Register</h2>
+            .auth-card {
+                background: var(--bg-white);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-8);
+                box-shadow: var(--shadow-2xl);
+                border: 1px solid var(--bg-light-gray);
+                max-width: 500px;
+                margin: 0 auto;
+            }
 
-        <div th:if="${param.success}" class="alert alert-success">
-            Registration successful! Please <a th:href="@{/login}">login</a>.
-        </div>
+            .auth-logo {
+                font-size: 3rem;
+                background: var(--gradient-accent);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                margin-bottom: var(--space-4);
+            }
+        </style>
+    </th:block>
 
-        <form th:action="@{/register}" method="post" th:object="${user}"
-            style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+    <main layout:fragment="content">
+        <section class="auth-section">
+            <div class="container">
+                <div class="auth-card scroll-animate">
+                    <div class="text-center mb-8">
+                        <i class="fas fa-sparkles auth-logo"></i>
+                        <h1 class="text-3xl font-black text-indigo mb-1">Join Alariis</h1>
+                        <p class="text-secondary">Start your personal reading journey today</p>
+                    </div>
 
-            <div class="form-group">
-                <label for="fullName">Full Name</label>
-                <input type="text" id="fullName" th:field="*{fullName}" class="form-control" required>
-                <p th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}" class="alert-danger"
-                    style="margin-top: 5px; padding: 5px; font-size: 0.9rem;"></p>
+                    <!-- Alerts -->
+                    <div th:if="${param.success}" class="alert alert-success mb-6">
+                        <i class="fas fa-check-circle"></i> Success! You can now <a th:href="@{/login}"
+                            class="font-bold underline">Login</a>.
+                    </div>
+
+                    <form th:action="@{/register}" method="post" th:object="${user}">
+                        <div class="form-group mb-4">
+                            <label for="fullName" class="font-bold flex items-center gap-2 mb-2">
+                                <i class="fas fa-id-card text-tertiary"></i> Full Name
+                            </label>
+                            <input type="text" id="fullName" th:field="*{fullName}" class="form-control" required
+                                placeholder="e.g. John Doe">
+                            <p th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"
+                                class="text-error text-xs mt-1"></p>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label for="email" class="font-bold flex items-center gap-2 mb-2">
+                                <i class="fas fa-envelope text-tertiary"></i> Email Address
+                            </label>
+                            <input type="email" id="email" th:field="*{email}" class="form-control" required
+                                placeholder="name@example.com">
+                            <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}"
+                                class="text-error text-xs mt-1"></p>
+                        </div>
+
+                        <div class="form-group mb-8">
+                            <label for="password" class="font-bold flex items-center gap-2 mb-2">
+                                <i class="fas fa-lock text-tertiary"></i> Create Password
+                            </label>
+                            <input type="password" id="password" th:field="*{password}" class="form-control" required
+                                placeholder="Min. 6 characters">
+                            <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}"
+                                class="text-error text-xs mt-1"></p>
+                        </div>
+
+                        <button type="submit" class="btn btn-accent btn-lg w-full">
+                            <i class="fas fa-user-plus"></i> Create Private Account
+                        </button>
+
+                        <div class="mt-8 pt-6 border-top text-center">
+                            <p class="text-secondary">
+                                Already have an account?
+                                <a th:href="@{/login}" class="font-black text-indigo hover:underline">Log In</a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
             </div>
-
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" th:field="*{email}" class="form-control" required>
-                <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="alert-danger"
-                    style="margin-top: 5px; padding: 5px; font-size: 0.9rem;"></p>
-            </div>
-
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" th:field="*{password}" class="form-control" required>
-                <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="alert-danger"
-                    style="margin-top: 5px; padding: 5px; font-size: 0.9rem;"></p>
-            </div>
-
-            <button type="submit" class="btn" style="width: 100%;">Register</button>
-
-            <p style="margin-top: 1rem; text-align: center;">
-                Already have an account? <a th:href="@{/login}">Login here</a>
-            </p>
-        </form>
-    </div>
-
-    <div th:replace="~{fragments/footer :: footer}"></div>
+        </section>
+    </main>
 </body>
 
 </html>

@@ -21,4 +21,6 @@ public interface BookService {
     List<Book> searchBooks(String keyword);
 
     List<Book> findFeaturedBooks();
+
+    void decrementStock(Long bookId, int quantity);
 }

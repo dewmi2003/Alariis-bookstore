@@ -180,11 +180,32 @@ public class AdminController {
         return "redirect:/admin/orders";
     }
 
+    @GetMapping("/orders/edit/{id}")
+    public String editOrderForm(@PathVariable Long id, Model model) {
+        model.addAttribute("order", orderService.findOrderById(id));
+        return "admin/order_edit";
+    }
+
+    @PostMapping("/orders/update/{id}")
+    public String updateOrderDetails(@PathVariable Long id,
+            @RequestParam("status") String status,
+            @RequestParam("trackingNumber") String trackingNumber,
+            @RequestParam("shippingCompany") String shippingCompany) {
+        orderService.updateOrderDetails(id, status, trackingNumber, shippingCompany);
+        return "redirect:/admin/orders";
+    }
+
     // --- User Management ---
 
     @GetMapping("/users")
     public String listUsers(Model model) {
         model.addAttribute("users", userService.findAllUsers());
         return "admin/users";
+    }
+
+    @GetMapping("/users/delete/{id}")
+    public String deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return "redirect:/admin/users";
     }
 }

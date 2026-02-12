@@ -1,4 +1,79 @@
-<footer xmlns:th="http://www.thymeleaf.org">
-    <p>&copy; 2024 Bookstore Application. All rights reserved.</p>
-    <script th:src="@{/js/script.js}"></script>
+<footer class="footer-premium" xmlns:th="http://www.thymeleaf.org">
+    <div class="container py-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- About Section -->
+            <div class="footer-col">
+                <a th:href="@{/}" class="logo-premium mb-4" style="display: inline-flex;">
+                    <i class="fas fa-book-open logo-icon"></i>
+                    <span class="logo-text">Alariis</span>
+                </a>
+                <p class="text-tertiary text-sm leading-relaxed">
+                    Discover a curated world of literature. From timeless classics to modern masterpieces, Alariis is
+                    your premier destination for stories that inspire.
+                </p>
+                <div class="flex gap-4 mt-6">
+                    <a href="#" class="text-tertiary hover:text-indigo transition-colors"><i
+                            class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-tertiary hover:text-indigo transition-colors"><i
+                            class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-tertiary hover:text-indigo transition-colors"><i
+                            class="fab fa-github"></i></a>
+                </div>
+            </div>
+
+            <!-- Shop Links -->
+            <div class="footer-col">
+                <h4 class="text-white font-bold mb-4">Shop Collections</h4>
+                <ul class="flex flex-col gap-2">
+                    <li><a th:href="@{/books}" class="text-tertiary text-sm hover:text-white transition-colors">All
+                            Books</a></li>
+                    <li><a th:href="@{/books?category=fiction}"
+                            class="text-tertiary text-sm hover:text-white transition-colors">Fiction</a></li>
+                    <li><a th:href="@{/books?category=non-fiction}"
+                            class="text-tertiary text-sm hover:text-white transition-colors">Non-Fiction</a></li>
+                    <li><a th:href="@{/books?category=business}"
+                            class="text-tertiary text-sm hover:text-white transition-colors">Business & Tech</a></li>
+                </ul>
+            </div>
+
+            <!-- User Links -->
+            <div class="footer-col">
+                <h4 class="text-white font-bold mb-4">Account</h4>
+                <ul class="flex flex-col gap-2">
+                    <li><a th:href="@{/profile}" class="text-tertiary text-sm hover:text-white transition-colors">My
+                            Profile</a></li>
+                    <li><a th:href="@{/my-orders}"
+                            class="text-tertiary text-sm hover:text-white transition-colors">Order History</a></li>
+                    <li><a th:href="@{/cart}" class="text-tertiary text-sm hover:text-white transition-colors">Shopping
+                            Cart</a></li>
+                    <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin/dashboard}"
+                            class="text-tertiary text-sm hover:text-white transition-colors">Admin Dashboard</a></li>
+                </ul>
+            </div>
+
+            <!-- Support -->
+            <div class="footer-col">
+                <h4 class="text-white font-bold mb-4">Customer Support</h4>
+                <ul class="flex flex-col gap-2">
+                    <li><a href="#" class="text-tertiary text-sm hover:text-white transition-colors">Help Center</a>
+                    </li>
+                    <li><a href="#" class="text-tertiary text-sm hover:text-white transition-colors">Shipping Policy</a>
+                    </li>
+                    <li><a href="#" class="text-tertiary text-sm hover:text-white transition-colors">Contact Us</a></li>
+                </ul>
+                <div class="mt-6 p-4 bg-tertiary rounded-lg bg-opacity-10 border border-white border-opacity-10">
+                    <p class="text-xs text-secondary italic">"A room without books is like a body without a soul."</p>
+                </div>
+            </div>
+        </div>
+
+        <div
+            class="mt-12 pt-8 border-top border-white border-opacity-10 flex flex-wrap justify-between items-center gap-4">
+            <p class="text-tertiary text-xs">&copy; 2026 Alariis Bookstore Collective. Built for book lovers.</p>
+            <div class="flex gap-4 text-tertiary text-xs">
+                <a href="#" class="hover:text-white">Privacy Policy</a>
+                <a href="#" class="hover:text-white">Terms of Service</a>
+            </div>
+        </div>
+    </div>
 </footer>

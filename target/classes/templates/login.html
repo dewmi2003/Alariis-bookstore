@@ -1,45 +1,98 @@
+```html
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout}">
 
 <head>
-    <title>Login - Bookstore</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <title>Login - Alariis Bookstore</title>
 </head>
 
 <body>
-    <div th:replace="~{fragments/header :: nav}"></div>
+    <th:block layout:fragment="extra-css">
+        <style>
+            .auth-section {
+                min-height: 80vh;
+                display: flex;
+                align-items: center;
+                background: var(--bg-soft-white);
+                padding: var(--space-10) 0;
+            }
 
-    <div class="container" style="max-width: 400px;">
-        <h2 style="text-align: center;">Login</h2>
+            .auth-card {
+                background: var(--bg-white);
+                border-radius: var(--radius-2xl);
+                padding: var(--space-8);
+                box-shadow: var(--shadow-2xl);
+                border: 1px solid var(--bg-light-gray);
+                max-width: 450px;
+                margin: 0 auto;
+            }
 
-        <div th:if="${param.logout}" class="alert alert-success">
-            You have been logged out.
-        </div>
-        <div th:if="${param.error}" class="alert alert-danger">
-            Invalid username or password.
-        </div>
+            .auth-logo {
+                font-size: 3rem;
+                background: var(--gradient-primary);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                margin-bottom: var(--space-4);
+            }
+        </style>
+    </th:block>
 
-        <form th:action="@{/login}" method="post"
-            style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-            <div class="form-group">
-                <label for="username">Email</label>
-                <input type="email" id="username" name="username" class="form-control" required autofocus>
+    <main layout:fragment="content">
+        <section class="auth-section">
+            <div class="container">
+                <div class="auth-card scroll-animate">
+                    <div class="text-center mb-8">
+                        <i class="fas fa-book-reader auth-logo"></i>
+                        <h1 class="text-3xl font-black text-indigo mb-1">Welcome Back</h1>
+                        <p class="text-secondary">Log in to your Alariis account</p>
+                    </div>
+
+                    <!-- Alerts -->
+                    <div th:if="${param.logout}" class="alert alert-success mb-6">
+                        <i class="fas fa-info-circle"></i> You have been safely logged out.
+                    </div>
+                    <div th:if="${param.error}" class="alert alert-error mb-6">
+                        <i class="fas fa-exclamation-circle"></i> Invalid email or password.
+                    </div>
+
+                    <form th:action="@{/login}" method="post">
+                        <div class="form-group mb-4">
+                            <label for="username" class="font-bold flex items-center gap-2 mb-2">
+                                <i class="fas fa-envelope text-tertiary"></i> Email Address
+                            </label>
+                            <input type="email" id="username" name="username" class="form-control" required autofocus
+                                placeholder="name@example.com">
+                        </div>
+
+                        <div class="form-group mb-6">
+                            <label for="password" class="font-bold flex items-center gap-2 mb-2">
+                                <i class="fas fa-lock text-tertiary"></i> Password
+                            </label>
+                            <input type="password" id="password" name="password" class="form-control" required
+                                placeholder="••••••••">
+                            <div class="text-right mt-2">
+                                <a href="#" class="text-xs text-indigo hover:underline">Forgot password?</a>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-full">
+                            <i class="fas fa-sign-in-alt"></i> Access Account
+                        </button>
+
+                        <div class="mt-8 pt-6 border-top text-center">
+                            <p class="text-secondary">
+                                New to Alariis?
+                                <a th:href="@{/register}" class="font-black text-indigo hover:underline">Create
+                                    Account</a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
             </div>
-
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" class="form-control" required>
-            </div>
-
-            <button type="submit" class="btn" style="width: 100%;">Login</button>
-
-            <p style="margin-top: 1rem; text-align: center;">
-                Don't have an account? <a th:href="@{/register}">Register here</a>
-            </p>
-        </form>
-    </div>
-
-    <div th:replace="~{fragments/footer :: footer}"></div>
+        </section>
+    </main>
 </body>
 
 </html>
+```

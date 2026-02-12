@@ -1,38 +1,85 @@
-<nav xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" class="navbar">
+<nav th:fragment="nav" class="premium-nav" id="mainNav" xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <div class="nav-container">
-        <a th:href="@{/}" class="logo">
-            <span class="logo-icon">✨</span>
-            <span class="logo-text">Alaris Bookstore</span>
+        <!-- Logo -->
+        <a th:href="@{/}" class="logo-premium">
+            <i class="fas fa-book-open logo-icon"></i>
+            <span class="logo-text">Alariis</span>
         </a>
 
-        <div class="nav-menu">
-            <a th:href="@{/books}" class="nav-link" sec:authorize="!hasRole('ADMIN')">Browse Books</a>
+        <!-- Search Bar (Hidden on mobile, shown on desktop) -->
+        <div class="search-bar-wrapper" sec:authorize="!hasRole('ADMIN')">
+            <i class="fas fa-search search-icon"></i>
+            <form th:action="@{/books}" method="get" style="width: 100%; display: flex;">
+                <input type="text" name="keyword" class="search-bar" placeholder="Search for books, authors, ISBN..."
+                    th:value="${keyword}" autocomplete="off" id="globalSearch">
+                <button type="submit" class="search-btn">Search</button>
+            </form>
+            <!-- Search Suggestions Dropdown -->
+            <div id="searchSuggestions" class="search-suggestions" style="display: none;"></div>
+        </div>
 
-            <!-- ADMIN LINKS -->
-            <span sec:authorize="hasRole('ADMIN')" style="display: flex; gap: 20px;">
-                <a th:href="@{/admin/dashboard}" class="nav-link admin-link">Dashboard</a>
-            </span>
+        <!-- Navigation Actions -->
+        <div class="nav-actions">
+            <!-- Voice Search Button -->
+            <button class="theme-toggle" id="voiceSearchBtn" title="Voice search" sec:authorize="!hasRole('ADMIN')">
+                <i class="fas fa-microphone"></i>
+            </button>
 
-            <!-- USER LINKS (Visible to Customers) -->
-            <span sec:authorize="isAuthenticated() and !hasRole('ADMIN')" style="display: flex; gap: 20px;">
-                <a th:href="@{/cart}" class="nav-link cart-link">
-                    Cart <span class="cart-badge" th:if="${session.cartItemCount > 0}"
+            <!-- Theme Toggle -->
+            <button class="theme-toggle" id="themeToggle" title="Toggle dark mode">
+                <i class="fas fa-moon"></i>
+            </button>
+
+            <!-- Admin Links -->
+            <div sec:authorize="hasRole('ADMIN')" class="flex gap-2">
+                <a th:href="@{/admin/dashboard}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Dashboard
+                </a>
+            </div>
+
+            <!-- Cart (Visible to Customers and Guests, Hidden for Admin) -->
+            <div sec:authorize="!hasRole('ADMIN')" class="flex gap-2">
+                <!-- Cart Icon -->
+                <a th:href="@{/cart}" class="nav-icon-btn" title="Shopping Cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="badge-count" th:if="${session.cartItemCount != null && session.cartItemCount > 0}"
                         th:text="${session.cartItemCount}">0</span>
                 </a>
-                <a th:href="@{/orders}" class="nav-link">My Orders</a>
-            </span>
+            </div>
 
-            <!-- AUTH BUTTONS -->
-            <span sec:authorize="isAnonymous()">
-                <a th:href="@{/login}" class="btn-login">Login</a>
-                <a th:href="@{/register}" class="btn-register">Register</a>
-            </span>
+            <!-- Auth Buttons -->
+            <div class="nav-auth" sec:authorize="isAnonymous()">
+                <a th:href="@{/login}" class="btn-nav-login">Login</a>
+                <a th:href="@{/register}" class="btn-nav-register">Register</a>
+            </div>
 
-            <span sec:authorize="isAuthenticated()">
-                <form th:action="@{/logout}" method="post" style="display: inline;">
-                    <button type="submit" class="logout-btn">Logout</button>
-                </form>
-            </span>
+            <!-- User Dropdown -->
+            <div class="user-dropdown" sec:authorize="isAuthenticated()">
+                <button class="user-btn">
+                    <i class="fas fa-user-circle"></i>
+                    <span sec:authentication="name">User</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="dropdown-menu">
+                    <a th:href="@{/profile}" class="dropdown-item" sec:authorize="!hasRole('ADMIN')">
+                        <i class="fas fa-user"></i>
+                        My Profile
+                    </a>
+                    <a th:href="@{/my-orders}" class="dropdown-item" sec:authorize="!hasRole('ADMIN')">
+                        <i class="fas fa-box"></i>
+                        My Orders
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <form th:action="@{/logout}" method="post" style="margin: 0;">
+                        <button type="submit" class="logout-dropdown">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </nav>

@@ -1,68 +1,102 @@
 package com.bookstore.service.impl;
 
+import com.bookstore.dto.UserDto;
 import com.bookstore.dto.UserRegistrationDto;
 import com.bookstore.entity.Role;
 import com.bookstore.entity.User;
+import com.bookstore.exception.ResourceNotFoundException;
 import com.bookstore.repository.RoleRepository;
 import com.bookstore.repository.UserRepository;
 import com.bookstore.service.UserService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
 
-    private UserRepository userRepository;
-    private RoleRepository roleRepository;
-    private PasswordEncoder passwordEncoder;
-
-    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository,
-            PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
+    @Transactional
     public void saveUser(UserRegistrationDto registrationDto) {
-        User user = new User();
-        user.setFullName(registrationDto.getFullName());
-        user.setEmail(registrationDto.getEmail());
-        user.setPassword(passwordEncoder.encode(registrationDto.getPassword()));
+        log.info("Registering new user with email: {}", registrationDto.getEmail());
+
+        User user = User.builder()
+                .fullName(registrationDto.getFullName())
+                .email(registrationDto.getEmail())
+                .password(passwordEncoder.encode(registrationDto.getPassword()))
+                .build();
 
         Role role = roleRepository.findByName("ROLE_CUSTOMER");
         if (role == null) {
-            role = checkRoleExist();
+            role = createCustomerRole();
         }
-        user.setRoles(Arrays.asList(role));
+        user.setRoles(Collections.singletonList(role));
         userRepository.save(user);
     }
 
     @Override
     public User findUserByEmail(String email) {
+        log.debug("Finding user by email: {}", email);
         return userRepository.findByEmail(email).orElse(null);
     }
 
     @Override
-    public List<UserRegistrationDto> findAllUsers() {
-        List<User> users = userRepository.findAll();
-        return users.stream()
-                .map((user) -> mapToUserDto(user))
+    public List<UserDto> findAllUsers() {
+        log.debug("Finding all users");
+        return userRepository.findAll().stream()
+                .map(this::mapToUserDto)
                 .collect(Collectors.toList());
     }
 
-    private UserRegistrationDto mapToUserDto(User user) {
-        UserRegistrationDto userDto = new UserRegistrationDto();
-        userDto.setFullName(user.getFullName());
-        userDto.setEmail(user.getEmail());
-        return userDto;
+    @Override
+    @Transactional
+    public void deleteUser(Long id) {
+        log.info("Deleting user with id: {}", id);
+        if (!userRepository.existsById(id)) {
+            throw new ResourceNotFoundException("User not found with id: " + id);
+        }
+        userRepository.deleteById(id);
     }
 
-    private Role checkRoleExist() {
+    @Override
+    @Transactional
+    public void updateUser(User user) {
+        log.info("Updating user with id: {}", user.getId());
+        User existingUser = userRepository.findById(user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + user.getId()));
+
+        existingUser.setFullName(user.getFullName());
+        existingUser.setPhoneNumber(user.getPhoneNumber());
+        existingUser.setAddress(user.getAddress());
+        existingUser.setCity(user.getCity());
+        existingUser.setZipCode(user.getZipCode());
+
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+        userRepository.save(existingUser);
+    }
+
+    private UserDto mapToUserDto(User user) {
+        return new UserDto(user.getId(), user.getFullName(), user.getEmail(), user.getPhoneNumber(),
+                user.getCity(), user.getRoles(), user.getCreatedAt());
+    }
+
+    private Role createCustomerRole() {
+        log.info("Creating ROLE_CUSTOMER because it doesn't exist");
         Role role = new Role();
         role.setName("ROLE_CUSTOMER");
         return roleRepository.save(role);

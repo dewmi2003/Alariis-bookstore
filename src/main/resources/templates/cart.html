@@ -1,103 +1,182 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout}">
 
 <head>
-    <title>Shopping Cart - Bookstore</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <title>Shopping Cart - Alariis Bookstore</title>
 </head>
 
 <body>
-    <div th:replace="~{fragments/header :: nav}"></div>
+    <th:block layout:fragment="extra-css">
+        <style>
+            .cart-grid {
+                display: grid;
+                grid-template-columns: 1fr 350px;
+                gap: var(--space-6);
+                align-items: start;
+            }
 
-    <div class="container">
-        <h1>Shopping Cart</h1>
+            .cart-item-card {
+                background: var(--bg-white);
+                border-radius: var(--radius-xl);
+                padding: var(--space-3);
+                margin-bottom: var(--space-3);
+                display: flex;
+                gap: var(--space-4);
+                box-shadow: var(--shadow-sm);
+                transition: var(--transition-base);
+                border: 1px solid var(--bg-light-gray);
+            }
 
-        <div th:if="${param.error == 'empty'}" class="alert alert-danger">
-            Your cart is empty. Please add items before checkout.
-        </div>
+            .cart-item-card:hover {
+                box-shadow: var(--shadow-md);
+                transform: translateY(-2px);
+            }
 
-        <div th:if="${#lists.isEmpty(cartItems)}">
-            <div style="text-align: center; padding: 3rem; background: white; border-radius: 8px;">
-                <h3>Your cart is empty</h3>
-                <p style="color: #666; margin: 1rem 0;">Browse our collection and add some books!</p>
-                <a th:href="@{/books}" class="btn">Browse Books</a>
+            .cart-img {
+                width: 100px;
+                height: 140px;
+                object-fit: cover;
+                border-radius: var(--radius-md);
+                box-shadow: var(--shadow-sm);
+            }
+
+            .summary-box {
+                background: var(--bg-white);
+                border-radius: var(--radius-xl);
+                padding: var(--space-4);
+                box-shadow: var(--shadow-lg);
+                border: 1px solid var(--bg-light-gray);
+                position: sticky;
+                top: 100px;
+            }
+
+            @media (max-width: 992px) {
+                .cart-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .summary-box {
+                    position: static;
+                }
+            }
+        </style>
+    </th:block>
+
+    <main layout:fragment="content">
+        <div class="container mt-4">
+            <h1 class="mb-4"><i class="fas fa-shopping-basket text-indigo"></i> Your Shopping Basket</h1>
+
+            <!-- Empty State -->
+            <div th:if="${#lists.isEmpty(cartItems)}" class="card text-center py-10 scroll-animate">
+                <i class="fas fa-shopping-cart fa-5x text-light mb-4"></i>
+                <h2 class="text-secondary">Your basket is quite light!</h2>
+                <p class="text-tertiary mb-6">Explore our library and fill it with amazing stories.</p>
+                <a th:href="@{/books}" class="btn btn-primary btn-lg">Browse Books</a>
             </div>
-        </div>
 
-        <div th:if="${!#lists.isEmpty(cartItems)}">
-            <div style="background: white; border-radius: 8px; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr style="border-bottom: 2px solid #eee;">
-                            <th style="padding: 1rem; text-align: left;">Book</th>
-                            <th style="padding: 1rem; text-align: center;">Price</th>
-                            <th style="padding: 1rem; text-align: center;">Quantity</th>
-                            <th style="padding: 1rem; text-align: right;">Total</th>
-                            <th style="padding: 1rem; text-align: center;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="item : ${cartItems}" style="border-bottom: 1px solid #eee;">
-                            <td style="padding: 1rem;">
-                                <div style="display: flex; align-items: center; gap: 1rem;">
-                                    <img th:if="${item.book.coverImage != null}" 
-                                         th:src="@{'/images/books/' + ${item.book.coverImage}}" 
-                                         alt="Book Cover"
-                                         style="width: 60px; height: 80px; object-fit: cover; border-radius: 4px;">
-                                    <div th:if="${item.book.coverImage == null}" 
-                                         style="width: 60px; height: 80px; background: #f0f0f0; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #999;">
-                                        No Image
-                                    </div>
-                                    <div>
-                                        <div style="font-weight: 600;" th:text="${item.book.title}">Book Title</div>
-                                        <div style="color: #666; font-size: 0.9rem;" th:text="${item.book.author}">Author</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td style="padding: 1rem; text-align: center;">
-                                <span th:text="'$' + ${#numbers.formatDecimal(item.book.price, 1, 2)}">$0.00</span>
-                            </td>
-                            <td style="padding: 1rem; text-align: center;">
-                                <form th:action="@{/cart/update}" method="post" style="display: inline-flex; align-items: center; gap: 0.5rem;">
-                                    <input type="hidden" name="bookId" th:value="${item.book.id}">
-                                    <input type="number" name="quantity" th:value="${item.quantity}" 
-                                           min="1" max="99" 
-                                           style="width: 60px; padding: 0.25rem; text-align: center; border: 1px solid #ddd; border-radius: 4px;">
-                                    <button type="submit" class="btn" style="padding: 0.25rem 0.75rem; font-size: 0.85rem;">Update</button>
-                                </form>
-                            </td>
-                            <td style="padding: 1rem; text-align: right; font-weight: 600;">
-                                <span th:text="'$' + ${#numbers.formatDecimal(item.totalPrice, 1, 2)}">$0.00</span>
-                            </td>
-                            <td style="padding: 1rem; text-align: center;">
-                                <a th:href="@{'/cart/remove/' + ${item.book.id}}" 
-                                   onclick="return confirm('Remove this item from cart?');"
-                                   style="color: #e74c3c; text-decoration: none; font-weight: 500;">
-                                    Remove
-                                </a>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 2px solid #eee; display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <a th:href="@{/books}" style="color: #3498db; text-decoration: none;">← Continue Shopping</a>
-                    </div>
-                    <div style="text-align: right;">
-                        <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;">
-                            Total: <span th:text="'$' + ${#numbers.formatDecimal(totalAmount, 1, 2)}">$0.00</span>
+            <div th:unless="${#lists.isEmpty(cartItems)}" class="cart-grid">
+                <!-- Items List -->
+                <div class="cart-items-list">
+                    <div class="cart-item-card scroll-animate" th:each="item : ${cartItems}">
+                        <img th:if="${item.book.coverImage != null}"
+                            th:src="@{'/images/books/' + ${item.book.coverImage}}" class="cart-img">
+                        <div th:if="${item.book.coverImage == null}"
+                            class="cart-img flex items-center justify-center bg-gray">
+                            <i class="fas fa-book fa-2x text-light"></i>
                         </div>
-                        <a th:href="@{/checkout}" class="btn" style="font-size: 1.1rem; padding: 0.75rem 2rem;">
-                            Proceed to Checkout
-                        </a>
+
+                        <div class="flex-grow flex flex-col justify-between">
+                            <div>
+                                <h3 th:text="${item.book.title}" class="text-xl">Book Title</h3>
+                                <p th:text="${item.book.author}" class="text-secondary text-sm">Author</p>
+                            </div>
+
+                            <div class="flex justify-between items-end mt-4">
+                                <div class="flex items-center gap-2">
+                                    <form th:action="@{/cart/update}" method="post"
+                                        class="flex items-center gap-1 bg-light-gray p-1 rounded-md">
+                                        <input type="hidden" name="bookId" th:value="${item.book.id}">
+                                        <button type="submit" class="btn btn-sm btn-ghost p-1" name="quantity"
+                                            th:value="${item.quantity - 1}" th:disabled="${item.quantity <= 1}">
+                                            <i class="fas fa-minus text-xs"></i>
+                                        </button>
+                                        <input type="number" readonly th:value="${item.quantity}"
+                                            class="font-bold text-center w-8 bg-transparent border-none">
+                                        <button type="submit" class="btn btn-sm btn-ghost p-1" name="quantity"
+                                            th:value="${item.quantity + 1}">
+                                            <i class="fas fa-plus text-xs"></i>
+                                        </button>
+                                    </form>
+                                    <a th:href="@{'/cart/remove/' + ${item.book.id}}"
+                                        class="text-error text-sm hover:underline ml-2"
+                                        onclick="return confirm('Remove item?')">
+                                        <i class="fas fa-trash"></i> Remove
+                                    </a>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-xs text-tertiary" th:text="'$' + ${item.book.price} + ' each'">
+                                        $0.00 each</div>
+                                    <div class="text-xl font-bold text-indigo"
+                                        th:text="'$' + ${#numbers.formatDecimal(item.totalPrice, 1, 2)}">$0.00</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Summary Sidebar -->
+                <aside class="summary-box scroll-animate">
+                    <h3 class="mb-4 border-bottom pb-2">Order Summary</h3>
+
+                    <div class="flex justify-between mb-2">
+                        <span class="text-secondary">Subtotal</span>
+                        <strong th:text="'$' + ${#numbers.formatDecimal(totalAmount, 1, 2)}">$0.00</strong>
+                    </div>
+
+                    <div class="flex justify-between mb-2">
+                        <span class="text-secondary">Shipping</span>
+                        <span class="text-success font-bold">FREE</span>
+                    </div>
+
+                    <div class="flex justify-between mb-4 border-bottom pb-4">
+                        <span class="text-secondary">Est. Tax (10%)</span>
+                        <strong th:text="'$' + ${#numbers.formatDecimal(totalAmount * 0.1, 1, 2)}">$0.00</strong>
+                    </div>
+
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="text-lg font-bold">Total</span>
+                        <span class="text-3xl font-black text-indigo"
+                            th:text="'$' + ${#numbers.formatDecimal(totalAmount + (totalAmount * 0.1), 1, 2)}">$0.00</span>
+                    </div>
+
+                    <form th:action="@{/cart/clear}" method="post" class="mb-3">
+                        <button type="submit" class="btn btn-outline-error w-full"
+                            onclick="return confirm('Are you sure you want to remove all items from your basket?')">
+                            <i class="fas fa-trash-alt"></i> Remove All Items
+                        </button>
+                    </form>
+
+                    <a th:href="@{/checkout}" class="btn btn-accent btn-lg w-full mb-3" style="width: 100%;">
+                        <i class="fas fa-shield-alt"></i> Checkout Securely
+                    </a>
+                    <a th:href="@{/books}" class="btn btn-ghost w-full" style="width: 100%;">
+                        <i class="fas fa-arrow-left"></i> Keep Shopping
+                    </a>
+
+                    <div class="mt-6 pt-4 border-top text-center">
+                        <div class="flex justify-around text-tertiary">
+                            <i class="fab fa-cc-visa fa-2x"></i>
+                            <i class="fab fa-cc-mastercard fa-2x"></i>
+                            <i class="fab fa-cc-paypal fa-2x"></i>
+                            <i class="fab fa-cc-apple-pay fa-2x"></i>
+                        </div>
+                        <p class="text-xs text-tertiary mt-4">SSL Encryption Enabled</p>
+                    </div>
+                </aside>
             </div>
         </div>
-    </div>
-
-    <div th:replace="~{fragments/footer :: footer}"></div>
+    </main>
 </body>
 
 </html>

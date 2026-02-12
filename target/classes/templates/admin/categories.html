@@ -1,40 +1,53 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout}">
 
 <head>
-    <title>Manage Categories - Admin</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <title>Manage Categories</title>
 </head>
 
 <body>
-    <div th:replace="~{fragments/header :: nav}"></div>
-    <div class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-            <h1>Manage Categories</h1>
-            <a th:href="@{/admin/categories/new}" class="btn">Add New Category</a>
+    <main layout:fragment="content">
+        <div class="container mt-4">
+            <div class="flex justify-between items-center mb-4">
+                <h1>Manage Categories</h1>
+                <a th:href="@{/admin/categories/new}" class="btn btn-accent">
+                    <i class="fas fa-plus"></i> Add New Category
+                </a>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Book Count</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="cat : ${categories}">
+                        <td th:text="${cat.id}">1</td>
+                        <td th:text="${cat.name}" style="font-weight: 600;">Fiction</td>
+                        <td th:text="${cat.books != null ? cat.books.size() : 0}">0</td>
+                        <td>
+                            <div class="flex gap-1">
+                                <a th:href="@{'/admin/categories/edit/' + ${cat.id}}" class="btn btn-primary"
+                                    style="padding: 0.5rem; font-size: 0.8rem;">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a th:href="@{'/admin/categories/delete/' + ${cat.id}}" class="btn btn-accent"
+                                    onclick="return confirm('Are you sure you want to delete this category? Warning: This might affect books in this category.');"
+                                    style="padding: 0.5rem; font-size: 0.8rem;">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="category : ${categories}">
-                    <td th:text="${category.id}">1</td>
-                    <td th:text="${category.name}">Fiction</td>
-                    <td>
-                        <a th:href="@{'/admin/categories/delete/' + ${category.id}}" class="btn btn-danger"
-                            onclick="return confirm('Are you sure you want to delete this category?');"
-                            style="padding: 0.3rem 0.8rem; font-size: 0.9rem;">Delete</a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <div th:replace="~{fragments/footer :: footer}"></div>
+    </main>
 </body>
 
 </html>
