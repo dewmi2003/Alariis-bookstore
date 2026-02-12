@@ -18,11 +18,31 @@
         "requiredExtensions": {
             "codexEditor": "0.20.0",
             "frontierAuthentication": "0.4.23"
-        }
+        },
+        "validationCount": 1,
+        "validationCountAudio": 1,
+        "abbreviation": ""
     },
     "idAuthorities": {},
     "identification": {},
-    "languages": [],
+    "languages": [
+        {
+            "name": {
+                "en": "English"
+            },
+            "tag": "eng",
+            "refName": "English",
+            "projectStatus": "source"
+        },
+        {
+            "name": {
+                "en": "English"
+            },
+            "tag": "eng",
+            "refName": "English",
+            "projectStatus": "target"
+        }
+    ],
     "type": {
         "flavorType": {
             "name": "default",
@@ -110,5 +130,102 @@
     "ingredients": {},
     "copyright": {
         "shortStatements": []
-    }
+    },
+    "edits": [
+        {
+            "editMap": [
+                "meta",
+                "validationCount"
+            ],
+            "value": 1,
+            "timestamp": 1770888107314,
+            "type": "user-edit",
+            "author": "pramo23"
+        },
+        {
+            "editMap": [
+                "meta",
+                "validationCountAudio"
+            ],
+            "value": 1,
+            "timestamp": 1770888107314,
+            "type": "user-edit",
+            "author": "pramo23"
+        },
+        {
+            "editMap": [
+                "meta",
+                "abbreviation"
+            ],
+            "value": "",
+            "timestamp": 1770888107314,
+            "type": "user-edit",
+            "author": "pramo23"
+        },
+        {
+            "editMap": [
+                "languages"
+            ],
+            "value": [
+                {
+                    "name": {
+                        "en": "English"
+                    },
+                    "tag": "eng",
+                    "refName": "English",
+                    "projectStatus": "source"
+                },
+                {}
+            ],
+            "timestamp": 1770888107314,
+            "type": "user-edit",
+            "author": "pramo23"
+        },
+        {
+            "editMap": [
+                "spellcheckIsEnabled"
+            ],
+            "value": false,
+            "timestamp": 1770888107314,
+            "type": "user-edit",
+            "author": "pramo23"
+        },
+        {
+            "editMap": [
+                "languages"
+            ],
+            "value": [
+                {
+                    "name": {
+                        "en": "English"
+                    },
+                    "tag": "eng",
+                    "refName": "English",
+                    "projectStatus": "source"
+                },
+                {
+                    "name": {
+                        "en": "English"
+                    },
+                    "tag": "eng",
+                    "refName": "English",
+                    "projectStatus": "target"
+                }
+            ],
+            "timestamp": 1770888115278,
+            "type": "user-edit",
+            "author": "pramo23"
+        },
+        {
+            "editMap": [
+                "chatSystemMessage"
+            ],
+            "value": "When translating from English to English (such as between regional varieties, registers, or temporal periods), maintain awareness of lexical variation (e.g., \"lift\" vs. \"elevator,\" \"pavement\" vs. \"sidewalk\"), register shifts (formal \"purchase\" vs. informal \"buy\"), collocation patterns specific to each variety (British \"make a decision\" vs. American \"take a decision\"), grammatical differences (collective noun agreement, past tense forms like \"got\" vs. \"gotten\"), preposition usage (\"different from/to/than,\" \"at the weekend\" vs. \"on the weekend\"), and information structure preferences including word order variations and topicalization strategies. Pay attention to cultural references requiring localization, idiomatic expressions that don't transfer across varieties, spelling conventions (colour/color, realise/realize), punctuation practices (quotation mark placement), and temporal expressions (date formats, \"fortnight\" vs. \"two weeks\"). Consider pragmatic factors such as politeness strategies, directness levels, and discourse markers that vary by region or social context, while preserving the source text's tone, style, and communicative intent. Ensure terminological consistency within the target variety's conventions, respect genre-specific norms, and verify that collocations sound natural to speakers of the target variety rather than producing literal transfers that are grammatically correct but idiomatically awkward.",
+            "timestamp": 1770888136029,
+            "type": "user-edit",
+            "author": "pramo23"
+        }
+    ],
+    "spellcheckIsEnabled": false,
+    "chatSystemMessage": "When translating from English to English (such as between regional varieties, registers, or temporal periods), maintain awareness of lexical variation (e.g., \"lift\" vs. \"elevator,\" \"pavement\" vs. \"sidewalk\"), register shifts (formal \"purchase\" vs. informal \"buy\"), collocation patterns specific to each variety (British \"make a decision\" vs. American \"take a decision\"), grammatical differences (collective noun agreement, past tense forms like \"got\" vs. \"gotten\"), preposition usage (\"different from/to/than,\" \"at the weekend\" vs. \"on the weekend\"), and information structure preferences including word order variations and topicalization strategies. Pay attention to cultural references requiring localization, idiomatic expressions that don't transfer across varieties, spelling conventions (colour/color, realise/realize), punctuation practices (quotation mark placement), and temporal expressions (date formats, \"fortnight\" vs. \"two weeks\"). Consider pragmatic factors such as politeness strategies, directness levels, and discourse markers that vary by region or social context, while preserving the source text's tone, style, and communicative intent. Ensure terminological consistency within the target variety's conventions, respect genre-specific norms, and verify that collocations sound natural to speakers of the target variety rather than producing literal transfers that are grammatically correct but idiomatically awkward."
 }

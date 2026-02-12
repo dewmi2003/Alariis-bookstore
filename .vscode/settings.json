@@ -8,5 +8,21 @@
     "codex-project-manager.paratextReorderMigrationCompleted": true,
     "codex-project-manager.globalReferencesMigrationCompleted": true,
     "codex-project-manager.cellIdsToUuidMigrationCompleted": true,
-    "git.enabled": false
+    "git.enabled": false,
+    "codex-project-manager.sourceLanguage": {
+        "name": {
+            "en": "English"
+        },
+        "tag": "eng",
+        "refName": "English",
+        "projectStatus": "source"
+    },
+    "codex-project-manager.targetLanguage": {
+        "name": {
+            "en": "English"
+        },
+        "tag": "eng",
+        "refName": "English",
+        "projectStatus": "target"
+    }
 }
