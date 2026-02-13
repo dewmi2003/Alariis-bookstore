@@ -33,17 +33,16 @@ public class UserServiceImpl implements UserService {
     public void saveUser(UserRegistrationDto registrationDto) {
         log.info("Registering new user with email: {}", registrationDto.getEmail());
 
-        User user = User.builder()
-                .fullName(registrationDto.getFullName())
-                .email(registrationDto.getEmail())
-                .password(passwordEncoder.encode(registrationDto.getPassword()))
-                .build();
+        User user = new User();
+        user.setFullName(registrationDto.getFullName());
+        user.setEmail(registrationDto.getEmail());
+        user.setPassword(passwordEncoder.encode(registrationDto.getPassword()));
 
         Role role = roleRepository.findByName("ROLE_CUSTOMER");
         if (role == null) {
             role = createCustomerRole();
         }
-        user.setRoles(Collections.singletonList(role));
+        user.setRoles(List.of(role));
         userRepository.save(user);
     }
 
@@ -56,8 +55,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDto> findAllUsers() {
         log.debug("Finding all users");
-        return userRepository.findAll().stream()
-                .map(this::mapToUserDto)
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map((user) -> mapToUserDto(user))
                 .collect(Collectors.toList());
     }
 
@@ -65,9 +65,6 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteUser(Long id) {
         log.info("Deleting user with id: {}", id);
-        if (!userRepository.existsById(id)) {
-            throw new ResourceNotFoundException("User not found with id: " + id);
-        }
         userRepository.deleteById(id);
     }
 
@@ -84,9 +81,9 @@ public class UserServiceImpl implements UserService {
         existingUser.setCity(user.getCity());
         existingUser.setZipCode(user.getZipCode());
 
-        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
-            existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
-        }
+        // Password updates should be handled separately if needed,
+        // but for profile updates we don't encode here to avoid double encoding.
+        // If password needs changing, there should be a dedicated flow.
         userRepository.save(existingUser);
     }
 

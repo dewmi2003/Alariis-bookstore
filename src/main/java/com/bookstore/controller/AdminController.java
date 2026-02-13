@@ -19,6 +19,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.bookstore.entity.OrderItem;
+import com.bookstore.entity.Book;
+import com.bookstore.entity.Category;
+import com.bookstore.entity.Order;
+import com.bookstore.dto.UserDto;
+import com.bookstore.entity.User;
 
 @Controller
 @RequestMapping("/admin")
@@ -32,6 +43,8 @@ public class AdminController {
     @Value("${app.upload.dir}")
     private String uploadDir;
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     public AdminController(BookService bookService, CategoryService categoryService,
             OrderService orderService, UserService userService) {
         this.bookService = bookService;
@@ -41,7 +54,53 @@ public class AdminController {
     }
 
     @GetMapping("/dashboard")
-    public String dashboard() {
+    public String dashboard(Model model) throws JsonProcessingException {
+        List<Book> books = bookService.findAllBooks();
+        List<Order> orders = orderService.findAllOrders();
+        List<UserDto> users = userService.findAllUsers();
+        List<Category> categories = categoryService.findAllCategories();
+
+        model.addAttribute("books", books);
+        model.addAttribute("orders", orders);
+        model.addAttribute("users", users);
+        model.addAttribute("categories", categories);
+
+        // --- Dashboard Calculations ---
+
+        // 1. Daily Sales for Current Month
+        LocalDate now = LocalDate.now();
+        Map<String, Double> salesData = orders.stream()
+                .filter(o -> o.getOrderDate() != null &&
+                        o.getOrderDate().getMonth() == now.getMonth() &&
+                        o.getOrderDate().getYear() == now.getYear())
+                .collect(Collectors.groupingBy(
+                        o -> o.getOrderDate().toLocalDate().toString(),
+                        TreeMap::new,
+                        Collectors.summingDouble(com.bookstore.entity.Order::getTotalAmount)));
+        model.addAttribute("dailySalesJson", objectMapper.writeValueAsString(salesData));
+
+        // 2. Order Status Breakdown
+        Map<String, Long> statusData = orders.stream()
+                .collect(Collectors.groupingBy(com.bookstore.entity.Order::getStatus, Collectors.counting()));
+        model.addAttribute("orderStatusJson", objectMapper.writeValueAsString(statusData));
+
+        // 3. Top Selling Books (Top 5)
+        Map<String, Integer> topBooks = orders.stream()
+                .flatMap(o -> o.getItems().stream())
+                .collect(Collectors.groupingBy(
+                        item -> item.getBook().getTitle(),
+                        Collectors.summingInt(OrderItem::getQuantity)))
+                .entrySet().stream()
+                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                .limit(5)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+        model.addAttribute("topBooksJson", objectMapper.writeValueAsString(topBooks));
+
+        // 4. Low Stock Count
+        long lowStockCount = books.stream().filter(b -> b.getStockQuantity() != null && b.getStockQuantity() <= 5)
+                .count();
+        model.addAttribute("lowStockCount", lowStockCount);
+
         return "admin/dashboard";
     }
 
@@ -83,6 +142,11 @@ public class AdminController {
             }
         }
 
+        // Ensure stock is saved
+        if (book.getStockQuantity() == null) {
+            book.setStockQuantity(0);
+        }
+
         bookService.saveBook(book);
         return "redirect:/admin/books";
     }
@@ -106,6 +170,9 @@ public class AdminController {
         existingBook.setIsbn(book.getIsbn());
         existingBook.setDescription(book.getDescription());
         existingBook.setCategory(book.getCategory());
+
+        // Update stock quantity
+        existingBook.setStockQuantity(book.getStockQuantity());
 
         if (!startImage.isEmpty()) {
             String fileName = StringUtils.cleanPath(startImage.getOriginalFilename());
@@ -200,6 +267,7 @@ public class AdminController {
     @GetMapping("/users")
     public String listUsers(Model model) {
         model.addAttribute("users", userService.findAllUsers());
+        model.addAttribute("orders", orderService.findAllOrders());
         return "admin/users";
     }
 

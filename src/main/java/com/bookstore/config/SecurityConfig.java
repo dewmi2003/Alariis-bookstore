@@ -14,7 +14,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class SecurityConfig {
 
         @Bean
-        public static PasswordEncoder passwordEncoder() {
+        public PasswordEncoder passwordEncoder() {
                 return new BCryptPasswordEncoder();
         }
 
@@ -35,6 +35,7 @@ public class SecurityConfig {
                                 .formLogin(form -> form
                                                 .loginPage("/login")
                                                 .loginProcessingUrl("/login")
+                                                .usernameParameter("username")
                                                 .defaultSuccessUrl("/")
                                                 .permitAll())
                                 .oauth2Login(oauth2 -> oauth2
@@ -43,6 +44,8 @@ public class SecurityConfig {
                                 .logout(logout -> logout
                                                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                                                 .logoutSuccessUrl("/login?logout")
+                                                .invalidateHttpSession(true)
+                                                .deleteCookies("JSESSIONID")
                                                 .permitAll());
                 return http.build();
         }

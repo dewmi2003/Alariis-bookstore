@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class ContactController {
 
+    public ContactController() {
+    }
+
     @GetMapping("/contact")
     public String contact() {
         return "contact";
@@ -17,13 +20,10 @@ public class ContactController {
     public String sendMessage(@RequestParam("name") String name,
             @RequestParam("email") String email,
             @RequestParam("subject") String subject,
-            @RequestParam("message") String message) {
-        // Logic to send email (e.g., using JavaMailSender)
-        // For now, we'll just log it or simulate success
-        System.out.println("Message received from: " + name + " (" + email + ")");
-        System.out.println("Subject: " + subject);
-        System.out.println("Message: " + message);
+            @RequestParam("message") String message,
+            @RequestParam(value = "attachment", required = false) org.springframework.web.multipart.MultipartFile attachment) {
 
+        // Email sending disabled
         return "redirect:/contact?success";
     }
 }

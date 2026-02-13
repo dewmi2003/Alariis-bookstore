@@ -18,7 +18,7 @@ public interface BookService {
 
     void deleteBook(Long id);
 
-    List<Book> searchBooks(String keyword);
+    Page<Book> searchBooks(String keyword, Pageable pageable);
 
     List<Book> findFeaturedBooks();
 

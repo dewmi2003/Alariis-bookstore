@@ -1,0 +1,429 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title layout:title-pattern="$CONTENT_TITLE - Alariis Admin">Alariis Admin</title>
+
+    <!-- Google Fonts: Outfit & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Design System CSS -->
+    <link rel="stylesheet" th:href="@{/css/global-design-system.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-design-system.css}">
+
+    <!-- Page-specific CSS -->
+    <th:block layout:fragment="extra-css"></th:block>
+</head>
+
+<body class="admin-body" th:data-theme="${session.theme ?: 'light'}">
+    <!-- Sidebar Navigation -->
+    <aside class="admin-sidebar admin-glass">
+        <div class="sidebar-header">
+            <div class="admin-logo">
+                <i class="fas fa-book-reader"></i>
+                <span>Alariis</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <span class="nav-label">Main</span>
+                <a th:href="@{/admin/dashboard}" class="nav-link"
+                    th:classappend="${request.requestURI == '/admin/dashboard' ? 'active' : ''}">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <span class="nav-label">Management</span>
+                <a th:href="@{/admin/books}" class="nav-link"
+                    th:classappend="${request.requestURI.startsWith('/admin/books') ? 'active' : ''}">
+                    <i class="fas fa-book"></i>
+                    <span>Books</span>
+                </a>
+                <a th:href="@{/admin/categories}" class="nav-link"
+                    th:classappend="${request.requestURI.startsWith('/admin/categories') ? 'active' : ''}">
+                    <i class="fas fa-tags"></i>
+                    <span>Categories</span>
+                </a>
+                <a th:href="@{/admin/orders}" class="nav-link"
+                    th:classappend="${request.requestURI.startsWith('/admin/orders') ? 'active' : ''}">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Orders</span>
+                </a>
+                <a th:href="@{/admin/users}" class="nav-link"
+                    th:classappend="${request.requestURI.startsWith('/admin/users') ? 'active' : ''}">
+                    <i class="fas fa-users-cog"></i>
+                    <span>Users</span>
+                </a>
+            </div>
+
+            <div class="nav-section mt-auto">
+                <a th:href="@{/}" class="nav-link">
+                    <i class="fas fa-external-link-alt"></i>
+                    <span>View Store</span>
+                </a>
+                <a href="#" class="nav-link text-coral" onclick="document.getElementById('logoutForm').submit();">
+                    <i class="fas fa-power-off"></i>
+                    <span>Logout</span>
+                </a>
+                <form id="logoutForm" th:action="@{/logout}" method="post" style="display: none;"></form>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Topbar -->
+    <header class="admin-topbar admin-glass">
+        <div class="topbar-left">
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="topbar-title" layout:fragment="page-title">Dashboard</h1>
+        </div>
+
+        <div class="topbar-right">
+            <div class="search-box admin-neu-inset">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search anything...">
+            </div>
+
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </button>
+
+            <div class="admin-profile">
+                <div class="profile-info">
+                    <span class="profile-name" sec:authentication="name">Admin</span>
+                    <span class="profile-role">Administrator</span>
+                </div>
+                <div class="profile-avatar grad-purple">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="admin-main">
+        <!-- Global Alerts -->
+        <div class="admin-alerts" th:if="${successMessage || errorMessage}">
+            <div th:if="${successMessage}" class="admin-alert alert-success admin-glass glow-emerald">
+                <i class="fas fa-check-circle"></i>
+                <span th:text="${successMessage}">Success!</span>
+            </div>
+            <div th:if="${errorMessage}" class="admin-alert alert-error admin-glass glow-coral">
+                <i class="fas fa-exclamation-circle"></i>
+                <span th:text="${errorMessage}">Error!</span>
+            </div>
+        </div>
+
+        <div layout:fragment="content" class="fade-in">
+            <!-- Page content will be inserted here -->
+        </div>
+    </main>
+
+    <!-- Sidebar & Theme JS -->
+    <script>
+        document.getElementById('sidebarToggle').addEventListener('click', () => {
+            document.querySelector('.admin-sidebar').classList.toggle('collapsed');
+            document.querySelector('.admin-main').classList.toggle('expanded');
+            document.querySelector('.admin-topbar').classList.toggle('expanded');
+        });
+
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            body.setAttribute('data-theme', newTheme);
+
+            // Toggle icon
+            const icon = document.getElementById('themeToggle').querySelector('i');
+            icon.className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+
+            // Optional: Save theme preference via fetch
+            fetch(`/api/theme?name=${newTheme}`, { method: 'POST' });
+        });
+    </script>
+
+    <!-- Global JS -->
+    <script th:src="@{/js/design-system.js}"></script>
+
+    <!-- Page-specific JS -->
+    <th:block layout:fragment="extra-js"></th:block>
+
+    <style>
+        /* Sidebar Styles */
+        .admin-sidebar {
+            position: fixed;
+            left: 1.5rem;
+            top: 1.5rem;
+            bottom: 1.5rem;
+            width: 280px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            transition: width 0.3s ease, transform 0.3s ease;
+        }
+
+        .admin-sidebar.collapsed {
+            width: 80px;
+            padding: 1.5rem 0.75rem;
+        }
+
+        .admin-sidebar.collapsed .admin-logo span,
+        .admin-sidebar.collapsed .nav-label,
+        .admin-sidebar.collapsed .nav-link span {
+            display: none;
+        }
+
+        .admin-sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding: 0.75rem 0;
+        }
+
+        .admin-logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--admin-primary);
+            font-family: 'Outfit', sans-serif;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            height: 100%;
+        }
+
+        .nav-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--admin-text-muted);
+            margin-bottom: 0.25rem;
+            padding-left: 1rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            color: var(--admin-text-main);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .nav-link i {
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-link:hover {
+            background: rgba(124, 58, 237, 0.1);
+            color: var(--admin-primary);
+        }
+
+        .nav-link.active {
+            background: var(--admin-primary);
+            color: white;
+            box-shadow: 0 4px 12px var(--admin-primary-glow);
+        }
+
+        .text-coral {
+            color: var(--admin-warning) !important;
+        }
+
+        .text-coral:hover {
+            background: rgba(251, 113, 133, 0.1) !important;
+        }
+
+        /* Topbar Styles */
+        .admin-topbar {
+            position: fixed;
+            top: 1.5rem;
+            left: 310px;
+            right: 1.5rem;
+            height: 70px;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            transition: left 0.3s ease;
+        }
+
+        .admin-topbar.expanded {
+            left: 110px;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            color: var(--admin-text-muted);
+            font-size: 1.25rem;
+            cursor: pointer;
+        }
+
+        .topbar-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            width: 300px;
+        }
+
+        .search-box input {
+            background: none;
+            border: none;
+            outline: none;
+            color: var(--admin-text-main);
+            width: 100%;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--admin-text-muted);
+            font-size: 1.25rem;
+            cursor: pointer;
+        }
+
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            line-height: 1.2;
+        }
+
+        .profile-name {
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .profile-role {
+            font-size: 0.75rem;
+            color: var(--admin-text-muted);
+        }
+
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        /* Main Content Styles */
+        .admin-main {
+            margin-top: 100px;
+            margin-left: 310px;
+            padding: 1.5rem;
+            transition: margin-left 0.3s ease;
+        }
+
+        .admin-main.expanded {
+            margin-left: 110px;
+        }
+
+        .admin-alerts {
+            margin-bottom: 2rem;
+        }
+
+        .admin-alert {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 1024px) {
+            .admin-sidebar {
+                transform: translateX(-120%);
+            }
+
+            .admin-sidebar.active {
+                transform: translateX(0);
+            }
+
+            .admin-topbar,
+            .admin-main {
+                left: 1.5rem;
+                margin-left: 0;
+            }
+        }
+    </style>
+</body>
+
+</html>

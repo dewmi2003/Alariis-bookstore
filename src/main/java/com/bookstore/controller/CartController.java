@@ -20,7 +20,7 @@ public class CartController {
     }
 
     private void refreshCartCount(jakarta.servlet.http.HttpSession session) {
-        int count = cartService.getItems().stream().mapToInt(com.bookstore.dto.CartItem::getQuantity).sum();
+        int count = cartService.getItems().size();
         session.setAttribute("cartItemCount", count);
     }
 

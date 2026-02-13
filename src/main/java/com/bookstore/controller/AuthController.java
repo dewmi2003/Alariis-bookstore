@@ -48,6 +48,6 @@ public class AuthController {
         }
 
         userService.saveUser(userDto);
-        return "redirect:/register?success";
+        return "redirect:/login?success";
     }
 }

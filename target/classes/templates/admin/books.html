@@ -16,58 +16,77 @@
                 </a>
             </div>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Cover</th>
-                        <th>Title</th>
-                        <th>Author</th>
-                        <th>Price</th>
-                        <th>Category</th>
-                        <th>Featured</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="book : ${books}">
-                        <td th:text="${book.id}">1</td>
-                        <td>
-                            <img th:if="${book.coverImage != null}" th:src="@{'/images/books/' + ${book.coverImage}}"
-                                class="rounded-sm" style="height: 60px; width: 45px; object-fit: cover;">
-                            <div th:if="${book.coverImage == null}"
-                                class="flex items-center justify-center bg-gray rounded-sm"
-                                style="height: 60px; width: 45px;">
-                                <i class="fas fa-book text-light"></i>
-                            </div>
-                        </td>
-                        <td th:text="${book.title}" style="font-weight: 600;">Book Title</td>
-                        <td th:text="${book.author}">Author Name</td>
-                        <td th:text="'$' + ${book.price}" class="text-accent" style="font-weight: 700;">$10.00</td>
-                        <td th:text="${book.category != null ? book.category.name : '-'}">Category</td>
-                        <td>
-                            <a th:href="@{'/admin/books/toggle-feature/' + ${book.id}}"
-                                th:class="${book.featured} ? 'badge badge-success' : 'badge badge-secondary'"
-                                th:text="${book.featured} ? 'Yes' : 'No'" style="text-decoration: none;">
-                                No
-                            </a>
-                        </td>
-                        <td>
-                            <div class="flex gap-1">
-                                <a th:href="@{'/admin/books/edit/' + ${book.id}}" class="btn btn-primary"
-                                    style="padding: 0.5rem; font-size: 0.8rem;">
-                                    <i class="fas fa-edit"></i>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Cover</th>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Category</th>
+                            <th>Featured</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="book : ${books}"
+                            th:classappend="${book.stockQuantity <= 5} ? 'low-stock-row' : ''">
+                            <td th:text="${book.id}">1</td>
+                            <td>
+                                <img th:if="${book.coverImage != null}"
+                                    th:src="@{'/images/books/' + ${book.coverImage}}" class="rounded-sm"
+                                    style="height: 60px; width: 45px; object-fit: cover;">
+                                <div th:if="${book.coverImage == null}"
+                                    class="flex items-center justify-center bg-gray rounded-sm"
+                                    style="height: 60px; width: 45px;">
+                                    <i class="fas fa-book text-light"></i>
+                                </div>
+                            </td>
+                            <td th:text="${book.title}" style="font-weight: 600;">Book Title</td>
+                            <td th:text="${book.author}">Author Name</td>
+                            <td th:text="'Rs. ' + ${book.price}" class="text-accent" style="font-weight: 700;">Rs. 10.00
+                            </td>
+                            <td>
+                                <div class="flex flex-col gap-1">
+                                    <span th:text="${book.stockQuantity}"
+                                        th:class="${book.stockQuantity > 5 ? 'badge badge-success' : (book.stockQuantity > 0 ? 'badge badge-warning' : 'badge badge-error')}">
+                                        10
+                                    </span>
+                                    <a th:if="${book.stockQuantity <= 5}" th:href="@{'/admin/books/edit/' + ${book.id}}"
+                                        class="btn btn-xs btn-outline-warning"
+                                        style="padding: 2px 5px; font-size: 10px;">
+                                        <i class="fas fa-plus"></i> Restock
+                                    </a>
+                                </div>
+                            </td>
+                            <td th:text="${book.category != null ? book.category.name : '-'}">Category</td>
+                            <td>
+                                <a th:href="@{'/admin/books/toggle-feature/' + ${book.id}}"
+                                    th:class="${book.featured} ? 'badge badge-success' : 'badge badge-secondary'"
+                                    th:text="${book.featured} ? 'Yes' : 'No'" style="text-decoration: none;">
+                                    No
                                 </a>
-                                <a th:href="@{'/admin/books/delete/' + ${book.id}}" class="btn btn-accent"
-                                    onclick="return confirm('Are you sure you want to delete this book?');"
-                                    style="padding: 0.5rem; font-size: 0.8rem;">
-                                    <i class="fas fa-trash"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                            </td>
+                            <td>
+                                <div class="flex gap-1">
+                                    <a th:href="@{'/admin/books/edit/' + ${book.id}}" class="btn btn-primary"
+                                        style="padding: 0.5rem; font-size: 0.8rem;">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a th:href="@{'/admin/books/delete/' + ${book.id}}" class="btn btn-accent"
+                                        onclick="return confirm('Are you sure you want to delete this book?');"
+                                        style="padding: 0.5rem; font-size: 0.8rem;">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </main>
 </body>

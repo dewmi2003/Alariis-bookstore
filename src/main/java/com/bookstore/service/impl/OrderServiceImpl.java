@@ -2,6 +2,7 @@ package com.bookstore.service.impl;
 
 import com.bookstore.dto.CartItem;
 import com.bookstore.entity.Book;
+import com.bookstore.entity.Cart;
 import com.bookstore.entity.Order;
 import com.bookstore.entity.OrderItem;
 import com.bookstore.entity.User;
@@ -16,14 +17,18 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 public class OrderServiceImpl implements OrderService {
 
-    private OrderRepository orderRepository;
-    private CartService cartService;
-    private BookService bookService;
+    private static final Logger log = LoggerFactory.getLogger(OrderServiceImpl.class);
 
-    private UserService userService;
+    private final OrderRepository orderRepository;
+    private final CartService cartService;
+    private final BookService bookService;
+    private final UserService userService;
 
     public OrderServiceImpl(OrderRepository orderRepository, CartService cartService, BookService bookService,
             UserService userService) {
@@ -36,6 +41,8 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public Order createOrder(User user, String paymentMethod, String shippingAddress) {
+        log.info("Creating order for user: {}", user.getEmail());
+
         List<CartItem> cartItems = cartService.getItems();
         if (cartItems.isEmpty()) {
             throw new RuntimeException("Cart is empty");
@@ -45,41 +52,33 @@ public class OrderServiceImpl implements OrderService {
         order.setUser(user);
         order.setOrderDate(LocalDateTime.now());
         order.setStatus("PENDING");
-        order.setPaymentMethod(paymentMethod); // Set payment method
+        order.setPaymentMethod(paymentMethod);
+        order.setShippingAddress(shippingAddress);
 
-        // Update user address if provided and not set, or just set on order if Order
-        // has address field
-        // For now we assume User address is used or we can add address to Order entity
-        // Let's assume we use the address passed in.
-        // But Order entity doesn't have address field? It uses User's address in PDF.
-        // Let's check Order entity. It has shippingCompany etc but maybe not address.
-        // It's better if Order stores the address snapshot.
-        // For now, let's update User's address if it's new.
         if (shippingAddress != null && !shippingAddress.isEmpty()) {
             user.setAddress(shippingAddress);
-            userService.updateUser(user); // Update user's address
+            userService.updateUser(user);
         }
 
-        double shippingFee = 5.00; // Flat rate shipping
+        double shippingFee = 5.00;
         order.setShippingFee(shippingFee);
         order.setTotalAmount(cartService.getTotalAmount() + shippingFee);
-
-        order.setEstimatedDeliveryDate(LocalDateTime.now().plusDays(7)); // Default 7 days delivery
+        order.setEstimatedDeliveryDate(LocalDateTime.now().plusDays(7));
 
         for (CartItem cartItem : cartItems) {
             OrderItem orderItem = new OrderItem();
             orderItem.setBook(cartItem.getBook());
             orderItem.setQuantity(cartItem.getQuantity());
-            orderItem.setPrice(cartItem.getBook().getPrice()); // Freeze price
+            orderItem.setPrice(cartItem.getBook().getPrice());
             orderItem.setOrder(order);
             order.getItems().add(orderItem);
 
-            // Decrement stock
             bookService.decrementStock(cartItem.getBook().getId(), cartItem.getQuantity());
         }
 
         Order savedOrder = orderRepository.save(order);
         cartService.clearCart();
+
         return savedOrder;
     }
 
@@ -94,21 +93,25 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public void updateOrderStatus(Long orderId, String status) {
-        Order order = findOrderById(orderId);
+        Order order = orderRepository.findById(orderId).orElse(null);
         if (order != null) {
             order.setStatus(status);
+            // Don't touch the user entity - just update the order fields
             orderRepository.save(order);
         }
     }
 
     @Override
+    @Transactional
     public void updateOrderDetails(Long orderId, String status, String trackingNumber, String shippingCompany) {
-        Order order = findOrderById(orderId);
+        Order order = orderRepository.findById(orderId).orElse(null);
         if (order != null) {
             order.setStatus(status);
             order.setTrackingNumber(trackingNumber);
             order.setShippingCompany(shippingCompany);
+            // Don't touch the user entity - just update the order fields
             orderRepository.save(order);
         }
     }

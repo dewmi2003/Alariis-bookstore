@@ -33,6 +33,7 @@ public class Order extends BaseEntity {
     private Double shippingFee;
     private String trackingNumber;
     private String shippingCompany;
+    private String shippingAddress;
     private LocalDateTime estimatedDeliveryDate;
     private String paymentMethod;
 

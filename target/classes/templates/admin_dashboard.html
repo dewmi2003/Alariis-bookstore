@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Alariis Bookstore</title>
+    <link rel="stylesheet" href="../static/css/admin_dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Top Header -->
+        <header>
+            <div class="logo">Alariis</div>
+            <div class="header-right">
+                <button class="btn-dashboard">DASHBOARD</button>
+                <div class="user-profile">
+                    <span style="color: var(--text-gray); font-size: 0.875rem;">admin@bookstore.com</span>
+                    <div class="avatar">A</div>
+                    <i class="fas fa-chevron-down" style="font-size: 0.75rem; color: var(--text-gray);"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Title -->
+        <h1 style="font-size: 2.5rem; margin-bottom: 2rem; font-weight: 800;">Admin Dashboard</h1>
+
+        <!-- Section 1: Metrics -->
+        <div class="metrics-grid">
+            <div class="glass-card metric-card">
+                <i class="fas fa-wallet metric-icon" style="color: var(--accent-green);"></i>
+                <div class="metric-value">Rs. 769.00</div>
+                <div class="metric-label">Today's Sales</div>
+            </div>
+            <div class="glass-card metric-card">
+                <i class="fas fa-chart-line metric-icon" style="color: var(--accent-red);"></i>
+                <div class="metric-value">Rs. 1216.00</div>
+                <div class="metric-label">This Month</div>
+            </div>
+            <div class="glass-card metric-card">
+                <i class="fas fa-shopping-bag metric-icon" style="color: var(--primary-cyan);"></i>
+                <div class="metric-value">23</div>
+                <div class="metric-label">Total Orders</div>
+            </div>
+            <div class="glass-card metric-card">
+                <i class="fas fa-clock metric-icon" style="color: var(--accent-orange);"></i>
+                <div class="metric-value">0</div>
+                <div class="metric-label">Pending Orders</div>
+            </div>
+            <div class="glass-card metric-card">
+                <i class="fas fa-book metric-icon" style="color: var(--primary-purple);"></i>
+                <div class="metric-value">4</div>
+                <div class="metric-label">Total Books</div>
+            </div>
+            <div class="glass-card metric-card">
+                <i class="fas fa-users metric-icon" style="color: var(--primary-cyan);"></i>
+                <div class="metric-value">16</div>
+                <div class="metric-label">Total Users</div>
+            </div>
+        </div>
+
+        <!-- Low Stock Alert -->
+        <div class="glass-card alert-card">
+            <i class="fas fa-exclamation-triangle alert-icon"></i>
+            <div>
+                <div style="font-weight: 700; letter-spacing: 1px;">0 LOW STOCK ITEMS</div>
+            </div>
+        </div>
+
+        <!-- Section 2 & 3: Charts -->
+        <div class="charts-grid">
+            <div class="glass-card">
+                <h3 style="margin-bottom: 1.5rem; font-size: 1rem; color: var(--text-gray);">ORDER STATUS</h3>
+                <div class="chart-container">
+                    <canvas id="orderStatusChart"></canvas>
+                </div>
+            </div>
+            <div class="glass-card">
+                <h3 style="margin-bottom: 1.5rem; font-size: 1rem; color: var(--text-gray);">INVENTORY HEALTH</h3>
+                <div class="chart-container">
+                    <canvas id="inventoryHealthChart"></canvas>
+                    <div style="position: absolute; text-align: center;">
+                        <div style="font-size: 2rem; font-weight: 800; color: var(--accent-green);">HEALTHY</div>
+                        <div style="font-size: 0.75rem; color: var(--text-gray);">STOCK LEVEL</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Quick Actions -->
+        <div class="quick-actions">
+            <button class="btn-action btn-add"><i class="fas fa-plus"></i> ADD BOOK</button>
+            <button class="btn-action btn-category">CATEGORY</button>
+            <div class="glass-card pill">ORDERS <span
+                    style="margin-left: 0.5rem; background: var(--primary-purple); padding: 2px 8px; border-radius: 4px; font-size: 0.75rem;">6</span>
+            </div>
+            <div class="glass-card pill">INVENTORY</div>
+        </div>
+
+        <!-- Section 5: Management List -->
+        <div class="management-list">
+            <div class="glass-card list-row">
+                <div class="row-info">
+                    <i class="fas fa-book" style="color: var(--primary-purple);"></i>
+                    <span style="font-weight: 600;">Books</span>
+                </div>
+                <div class="row-actions">
+                    <button class="btn-small">Manage</button>
+                    <button class="btn-small btn-view">View</button>
+                </div>
+            </div>
+            <div class="glass-card list-row">
+                <div class="row-info">
+                    <i class="fas fa-shopping-cart" style="color: var(--primary-cyan);"></i>
+                    <span style="font-weight: 600;">Orders</span>
+                </div>
+                <div class="row-actions">
+                    <button class="btn-small">Process</button>
+                    <button class="btn-small btn-view">View</button>
+                </div>
+            </div>
+            <div class="glass-card list-row">
+                <div class="row-info">
+                    <i class="fas fa-tags" style="color: var(--accent-orange);"></i>
+                    <span style="font-weight: 600;">Categories</span>
+                </div>
+                <div class="row-actions">
+                    <button class="btn-small">Edit</button>
+                    <button class="btn-small btn-view">View</button>
+                </div>
+            </div>
+            <div class="glass-card list-row">
+                <div class="row-info">
+                    <i class="fas fa-user-shield" style="color: var(--primary-purple);"></i>
+                    <span style="font-weight: 600;">Users</span>
+                </div>
+                <div class="row-actions">
+                    <button class="btn-small">Edit</button>
+                    <button class="btn-small btn-view">View</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../static/js/admin_dashboard.js"></script>
+</body>
+
+</html>

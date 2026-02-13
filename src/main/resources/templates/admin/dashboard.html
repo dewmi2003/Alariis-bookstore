@@ -8,46 +8,182 @@
 
 <body>
     <main layout:fragment="content">
-        <div class="container mt-4">
-            <div class="text-center mb-4">
-                <h1>Admin Dashboard</h1>
-                <p class="text-secondary">Welcome back, Admin! Manage your store from here.</p>
+        <!-- CDNs for Interactive Elements -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/countup.js@2.8.0/dist/countup.min.js"></script>
+
+        <div class="container mt-2" th:with="
+            totalSales=${#aggregates.sum(orders.![totalAmount])},
+            todaySales=${#aggregates.sum(orders.?[orderDate != null && orderDate.toLocalDate().isEqual(T(java.time.LocalDate).now())].![totalAmount])},
+            monthSales=${#aggregates.sum(orders.?[orderDate != null && orderDate.getMonth() == T(java.time.LocalDate).now().getMonth() && orderDate.getYear() == T(java.time.LocalDate).now().getYear()].![totalAmount])},
+            pendingOrdersCount=${orders.?[status == 'PENDING'].size()},
+            lowStockBooksCount=${books.?[stockQuantity <= 5].size()}
+        ">
+            <div class="text-center mb-3">
+                <h2 class="scroll-animate animate-fade-in mb-1">Admin Dashboard</h2>
+                <p class="text-secondary text-sm">Real-time performance metrics.</p>
             </div>
 
-            <div class="grid grid-cols-4">
-                <!-- Manage Books Card -->
-                <div class="card text-center">
-                    <i class="fas fa-book" style="font-size: 3rem; color: var(--primary-indigo); margin-bottom: var(--space-2);"></i>
-                    <h3>Manage Books</h3>
-                    <p class="text-secondary">Add, edit, or delete books.</p>
-                    <a th:href="@{/admin/books}" class="btn btn-primary mt-2">Go to Books</a>
+            <!-- Stats Grid -->
+            <div class="admin-stats-grid">
+                <!-- Today's Sales -->
+                <div class="stat-card stat-success">
+                    <i class="fas fa-calendar-day stat-icon"></i>
+                    <div class="stat-value">Rs. <span id="todaySales"
+                            th:text="${#numbers.formatDecimal(todaySales ?: 0, 1, 2)}">0.00</span></div>
+                    <div class="stat-label">Today's Sales</div>
                 </div>
 
-                <!-- Manage Orders Card -->
-                <div class="card text-center">
-                    <i class="fas fa-shopping-cart" style="font-size: 3rem; color: var(--accent-coral); margin-bottom: var(--space-2);"></i>
-                    <h3>Manage Orders</h3>
-                    <p class="text-secondary">View and process customer orders.</p>
-                    <a th:href="@{/admin/orders}" class="btn btn-accent mt-2">Go to Orders</a>
+                <!-- Monthly Sales -->
+                <div class="stat-card stat-accent">
+                    <i class="fas fa-chart-line stat-icon"></i>
+                    <div class="stat-value">Rs. <span id="monthSales"
+                            th:text="${#numbers.formatDecimal(monthSales ?: 0, 1, 2)}">0.00</span></div>
+                    <div class="stat-label">This Month</div>
                 </div>
 
-                <!-- Manage Categories Card -->
-                <div class="card text-center">
-                    <i class="fas fa-tags" style="font-size: 3rem; color: var(--success); margin-bottom: var(--space-2);"></i>
-                    <h3>Manage Categories</h3>
-                    <p class="text-secondary">Add or remove book categories.</p>
-                    <a th:href="@{/admin/categories}" class="btn btn-primary mt-2">Go to Categories</a>
+                <!-- Total Orders -->
+                <div class="stat-card stat-info">
+                    <i class="fas fa-shopping-bag stat-icon"></i>
+                    <div class="stat-value" id="totalOrders" th:text="${orders.size()}">0</div>
+                    <div class="stat-label">Total Orders</div>
                 </div>
 
-                <!-- Manage Users Card -->
-                <div class="card text-center">
-                    <i class="fas fa-users" style="font-size: 3rem; color: var(--info); margin-bottom: var(--space-2);"></i>
-                    <h3>Manage Users</h3>
-                    <p class="text-secondary">View registered users.</p>
-                    <a th:href="@{/admin/users}" class="btn btn-primary mt-2">Go to Users</a>
+                <!-- Pending Orders -->
+                <div class="stat-card stat-warning">
+                    <i class="fas fa-clock stat-icon"></i>
+                    <div class="stat-value" id="pendingOrders" th:text="${pendingOrdersCount}">0</div>
+                    <div class="stat-label">Pending Orders</div>
+                </div>
+
+                <!-- Total Books -->
+                <div class="stat-card">
+                    <i class="fas fa-book stat-icon"></i>
+                    <div class="stat-value" id="totalBooks" th:text="${books.size()}">0</div>
+                    <div class="stat-label">Total Books</div>
+                </div>
+
+                <!-- Total Users -->
+                <div class="stat-card">
+                    <i class="fas fa-users stat-icon"></i>
+                    <div class="stat-value" id="totalUsers" th:text="${users.size()}">0</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+
+                <!-- Low Stock Alert -->
+                <div class="stat-card" th:classappend="${lowStockBooksCount > 0} ? 'stat-error' : ''">
+                    <i class="fas fa-exclamation-triangle stat-icon"></i>
+                    <div class="stat-value" id="lowStockItems" th:text="${lowStockBooksCount}">0</div>
+                    <div class="stat-label">Low Stock Items</div>
+                </div>
+            </div>
+
+
+            <!-- Main Charts Section (Density) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+                <!-- Order Status Breakdown -->
+                <div class="card p-3 shadow-sm">
+                    <h6 class="mb-2 text-xs uppercase text-secondary font-bold"><i
+                            class="fas fa-chart-pie text-accent"></i> Order Status</h6>
+                    <div style="height: 150px; display: flex; justify-content: center;">
+                        <canvas id="orderStatusChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Low Stock Distribution -->
+                <div class="card p-3 shadow-sm">
+                    <h6 class="mb-2 text-xs uppercase text-secondary font-bold"><i
+                            class="fas fa-exclamation-triangle text-error"></i> Inventory Health</h6>
+                    <div style="height: 150px; display: flex; justify-content: center;">
+                        <canvas id="lowStockChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions Bar (Compact) -->
+            <div class="card p-3 mb-4 shadow-sm border-0 bg-light">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <span class="text-xs uppercase text-secondary font-bold"><i class="fas fa-bolt text-accent"></i>
+                            Quick Actions:</span>
+                        <div class="flex flex-wrap gap-2">
+                            <a th:href="@{/admin/books/new}" class="btn btn-primary btn-xs px-3">Add Book</a>
+                            <a th:href="@{/admin/categories/new}" class="btn btn-accent btn-xs px-3">Category</a>
+                            <a th:href="@{/admin/orders}" class="btn btn-info btn-xs px-3">Orders <span
+                                    class="badge badge-warning text-xxs ml-1"
+                                    th:text="${pendingOrdersCount}">0</span></a>
+                            <a th:href="@{/admin/books}" class="btn btn-secondary btn-xs px-3">Inventory <span
+                                    class="badge badge-error text-xxs ml-1" th:if="${lowStockBooksCount > 0}"
+                                    th:text="${lowStockBooksCount}">0</span></a>
+                        </div>
+                    </div>
+                    <div th:if="${lowStockBooksCount > 0}"
+                        class="text-xs text-error animate-pulse font-bold flex items-center gap-2">
+                        <i class="fas fa-exclamation-circle"></i> <span>STOCK ALERT: <span
+                                th:text="${lowStockBooksCount}">0</span> ITEMS LOW</span>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4 opacity-10">
+
+            <!-- Secondary Navigation Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                <div class="card p-3 flex items-center gap-3 hover-lift shadow-sm">
+                    <div class="text-xl text-primary"><i class="fas fa-book-open"></i></div>
+                    <div>
+                        <h6 class="m-0 text-sm">Books</h6>
+                        <a th:href="@{/admin/books}"
+                            class="text-xxs text-primary hover:underline font-bold uppercase">Manage &rarr;</a>
+                    </div>
+                </div>
+                <div class="card p-3 flex items-center gap-3 hover-lift shadow-sm">
+                    <div class="text-xl text-accent"><i class="fas fa-receipt"></i></div>
+                    <div>
+                        <h6 class="m-0 text-sm">Orders</h6>
+                        <a th:href="@{/admin/orders}"
+                            class="text-xxs text-primary hover:underline font-bold uppercase">Process &rarr;</a>
+                    </div>
+                </div>
+                <div class="card p-3 flex items-center gap-3 hover-lift shadow-sm">
+                    <div class="text-xl text-success"><i class="fas fa-layer-group"></i></div>
+                    <div>
+                        <h6 class="m-0 text-sm">Categories</h6>
+                        <a th:href="@{/admin/categories}"
+                            class="text-xxs text-primary hover:underline font-bold uppercase">Edit &rarr;</a>
+                    </div>
+                </div>
+                <div class="card p-3 flex items-center gap-3 hover-lift shadow-sm">
+                    <div class="text-xl text-info"><i class="fas fa-user-shield"></i></div>
+                    <div>
+                        <h6 class="m-0 text-sm">Users</h6>
+                        <a th:href="@{/admin/users}"
+                            class="text-xxs text-primary hover:underline font-bold uppercase">View &rarr;</a>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- Dashboard JSON Data & Initialization -->
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            const dashboardData = {
+                dailySales: JSON.parse(/*[[${dailySalesJson}]]*/ '{}'),
+                orderStatus: JSON.parse(/*[[${orderStatusJson}]]*/ '{}'),
+                topBooks: JSON.parse(/*[[${topBooksJson}]]*/ '{}'),
+                counts: {
+                    todaySales: /*[[${todaySales ?: 0}]]*/ 0,
+                    monthSales: /*[[${monthSales ?: 0}]]*/ 0,
+                    totalOrders: /*[[${orders.size()}]]*/ 0,
+                    pendingOrders: /*[[${pendingOrdersCount}]]*/ 0,
+                    totalBooks: /*[[${books.size()}]]*/ 0,
+                    totalUsers: /*[[${users.size()}]]*/ 0,
+                    lowStockItems: /*[[${lowStockBooksCount}]]*/ 0
+                }
+            };
+            /*]]>*/
+        </script>
+        <script th:src="@{/js/admin-dashboard.js}"></script>
     </main>
 </body>
 

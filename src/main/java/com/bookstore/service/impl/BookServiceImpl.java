@@ -68,12 +68,12 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public List<Book> searchBooks(String keyword) {
-        log.debug("Searching books with keyword: {}", keyword);
-        if (keyword != null) {
-            return bookRepository.searchBooks(keyword);
+    public Page<Book> searchBooks(String keyword, Pageable pageable) {
+        log.debug("Searching books with keyword: {} and pageable: {}", keyword, pageable);
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            return bookRepository.searchBooks(keyword, pageable);
         }
-        return bookRepository.findAll();
+        return bookRepository.findByDeletedFalse(pageable);
     }
 
     @Override

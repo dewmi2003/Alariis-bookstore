@@ -38,9 +38,20 @@ public class BookController {
     }
 
     @GetMapping("/books")
-    public String listBooks(Model model, @RequestParam(value = "query", required = false) String query) {
-        List<Book> books = bookService.searchBooks(query);
-        model.addAttribute("books", books);
+    public String listBooks(Model model,
+            @RequestParam(value = "query", required = false) String query,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "9") int size) {
+
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
+        org.springframework.data.domain.Page<Book> bookPage = bookService.searchBooks(query, pageable);
+
+        model.addAttribute("books", bookPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", bookPage.getTotalPages());
+        model.addAttribute("totalItems", bookPage.getTotalElements());
+        model.addAttribute("query", query); // Pass query back for pagination links
+
         return "book_list";
     }
 

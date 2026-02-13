@@ -51,7 +51,9 @@ public class OrderController {
     @PostMapping("/checkout/process")
     public String processCheckout(@RequestParam("address") String address,
             @RequestParam("paymentMethod") String paymentMethod,
-            @AuthenticationPrincipal UserDetails userDetails) {
+            @AuthenticationPrincipal UserDetails userDetails,
+            jakarta.servlet.http.HttpSession session,
+            org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         User user = userService.findUserByEmail(userDetails.getUsername());
 
         try {
@@ -64,9 +66,11 @@ public class OrderController {
             }
 
             Order order = orderService.createOrder(user, paymentMethod, address);
+            session.setAttribute("cartItemCount", 0); // Reset cart count in session
             return "redirect:/order/confirmation/" + order.getId();
         } catch (RuntimeException | InterruptedException e) {
-            return "redirect:/cart?error=empty";
+            redirectAttributes.addFlashAttribute("errorMessage", "Order failed: " + e.getMessage());
+            return "redirect:/cart";
         }
     }
 

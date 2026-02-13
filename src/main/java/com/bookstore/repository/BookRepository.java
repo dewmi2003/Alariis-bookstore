@@ -11,7 +11,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     Page<Book> findByDeletedFalse(Pageable pageable);
 
     @Query("SELECT b FROM Book b WHERE b.deleted = false AND (LOWER(b.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(b.author) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(b.category.name) LIKE LOWER(CONCAT('%', :keyword, '%')))")
-    List<Book> searchBooks(String keyword);
+    Page<Book> searchBooks(String keyword, Pageable pageable);
 
     List<Book> findByCategoryAndDeletedFalse(com.bookstore.entity.Category category);
 
